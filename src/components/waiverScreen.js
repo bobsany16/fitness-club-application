@@ -38,26 +38,25 @@ class WaiverScreen extends React.Component {
               pellentesque nulla aliquam vel. Cras sit amet ligula erat. Proin
               id semper nunc. Vivamus a diam posuere, vehicula ex ut, finibus
               metus. Integer non vestibulum odio. Etiam in sem et tortor sodales
-              pharetra. Suspendisse quis enim dui.
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
-              vitae est venenatis, cursus mi et, hendrerit eros. Etiam
-              imperdiet, arcu id condimentum aliquam, est augue vehicula elit,
-              quis consequat tortor ligula eu mi. Suspendisse mauris quam,
-              malesuada eget mollis at, ornare id leo. Duis mauris arcu,
-              bibendum in maximus a, faucibus sed nibh. Integer at iaculis ex,
-              sit amet aliquet neque. Sed interdum nibh a arcu tempus, vel
-              ullamcorper tortor finibus. Proin purus felis, ullamcorper
-              porttitor dictum et, rutrum vel nibh. Integer aliquet euismod nunc
-              nec fermentum. In volutpat consectetur ipsum ultricies rhoncus.
-              Phasellus ullamcorper eget dolor vel gravida. Praesent volutpat
-              eget risus in fringilla. Maecenas non odio non felis condimentum
-              mollis. Vestibulum ante ipsum primis in faucibus orci luctus et
-              ultrices posuere cubilia Curae; Duis pretium diam vitae diam
-              faucibus consequat. Mauris dignissim ullamcorper ligula, in
-              pellentesque nulla aliquam vel. Cras sit amet ligula erat. Proin
-              id semper nunc. Vivamus a diam posuere, vehicula ex ut, finibus
-              metus. Integer non vestibulum odio. Etiam in sem et tortor sodales
-              pharetra. Suspendisse quis enim dui.{" "}
+              pharetra. Suspendisse quis enim dui. Lorem ipsum dolor sit amet,
+              consectetur adipiscing elit. Praesent vitae est venenatis, cursus
+              mi et, hendrerit eros. Etiam imperdiet, arcu id condimentum
+              aliquam, est augue vehicula elit, quis consequat tortor ligula eu
+              mi. Suspendisse mauris quam, malesuada eget mollis at, ornare id
+              leo. Duis mauris arcu, bibendum in maximus a, faucibus sed nibh.
+              Integer at iaculis ex, sit amet aliquet neque. Sed interdum nibh a
+              arcu tempus, vel ullamcorper tortor finibus. Proin purus felis,
+              ullamcorper porttitor dictum et, rutrum vel nibh. Integer aliquet
+              euismod nunc nec fermentum. In volutpat consectetur ipsum
+              ultricies rhoncus. Phasellus ullamcorper eget dolor vel gravida.
+              Praesent volutpat eget risus in fringilla. Maecenas non odio non
+              felis condimentum mollis. Vestibulum ante ipsum primis in faucibus
+              orci luctus et ultrices posuere cubilia Curae; Duis pretium diam
+              vitae diam faucibus consequat. Mauris dignissim ullamcorper
+              ligula, in pellentesque nulla aliquam vel. Cras sit amet ligula
+              erat. Proin id semper nunc. Vivamus a diam posuere, vehicula ex
+              ut, finibus metus. Integer non vestibulum odio. Etiam in sem et
+              tortor sodales pharetra. Suspendisse quis enim dui.{" "}
             </Text>
           </ScrollView>
         </View>
@@ -141,7 +140,6 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     margin: 13,
     marginTop: 20
-
   },
 
   acceptSection: {
