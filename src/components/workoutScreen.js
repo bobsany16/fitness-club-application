@@ -3,42 +3,39 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button, SearchBar } from "react-native-elements";
 
 class WorkoutScreen extends React.Component {
-  constructor(props){
-    super(props)
-    this.state={}
+  constructor(props) {
+    super(props);
+    this.state = {};
   }
-  componentDidMount() {
-    
-  }
+  //componentDidMount() {}
   render() {
     //console.log(this.props.screenProps.workoutNames);
     const workoutNames = this.props.screenProps.workoutNames;
+    var workoutButtons = [];
+
+    //Dynamically create Buttons based on size of array using map() function
+    workoutButtons = workoutNames.map(item => (
+      <Button
+        key={item}
+        buttonStyle={styles.workoutModels}
+        style={styles.workoutTitles}
+        type="solid"
+        title={item}
+      ></Button>
+    ));
     return (
       <View style={styles.container}>
         <View style={styles.searchSection}>
           <SearchBar
-            /*inputStyle={styles.search_bar_input}*/
+            inputStyle={styles.search_bar_input}
             containerStyle={styles.search_bar}
-            placeholder="Search"
+            placeholder="Search..."
             platform="default"
-            /*lightTheme="true"
-            round="true"*/
+            lightTheme={true}
+            round={true}
           />
         </View>
-        <ScrollView style={styles.workoutSection}>
-          <Button
-            buttonStyle={styles.workoutModels}
-            style={styles.workoutTitles}
-            title={workoutNames[0]}
-            type="solid"
-          ></Button>
-          <Button
-            buttonStyle={styles.workoutModels}
-            style={styles.workoutTitles}
-            title={workoutNames[1]}
-            type="solid"
-          ></Button>
-        </ScrollView>
+        <ScrollView style={styles.workoutSection}>{workoutButtons}</ScrollView>
       </View>
     );
   }
@@ -53,8 +50,8 @@ const styles = StyleSheet.create({
 
   searchSection: {
     height: "15%",
-    justifyContent: "flex-end"
-    /*backgroundColor: "#a29bfe"*/
+    justifyContent: "flex-end",
+    marginHorizontal: 15
   },
 
   search_bar: {
@@ -62,12 +59,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "transparent",
     borderTopColor: "transparent"
   },
-
-  /*search_bar_input: {
-    backgroundColor: "white",
-    borderColor: "white",
-    borderRadius: 5
-  },*/
 
   workoutSection: {
     flexDirection: "column",

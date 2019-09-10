@@ -27,7 +27,7 @@ export default class App extends React.Component {
   };
 
   getWorkoutData = async () => {
-    const res = await fetch('https://0e38b176.ngrok.io/workoutData');
+    const res = await fetch('https://fb65e02b.ngrok.io/workoutData');
     const workoutData = await res.json();
     return workoutData;
   }
