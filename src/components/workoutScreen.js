@@ -5,16 +5,41 @@ import { Button, SearchBar } from "react-native-elements";
 class WorkoutScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      workoutNames: [],
+      search: ''
+    };
   }
-  //componentDidMount() {}
-  render() {
-    //console.log(this.props.screenProps.workoutNames);
-    const workoutNames = this.props.screenProps.workoutNames;
-    var workoutButtons = [];
 
-    //Dynamically create Buttons based on size of array using map() function
-    workoutButtons = workoutNames.map(item => (
+  async componentDidMount() {
+    this.setState({
+      workoutNames: this.props.screenProps.workoutNames
+    })
+  }
+
+  toggleSearchView = text => {
+    let wNames = [];
+    for (let name of this.props.screenProps.workoutNames) {
+      if (name.includes(text)) {
+        wNames.push(name);
+      }
+    }
+    this.setState({
+      search: text,
+      workoutNames: wNames
+    })
+  }
+
+  clearSearch = () => {
+    this.setState({
+      search: '',
+      workoutNames: this.props.screenProps.workoutNames
+    })
+  }
+
+  render() {
+    var workoutButtons = [];
+    workoutButtons = this.state.workoutNames.map(item => (
       <Button
         key={item}
         buttonStyle={styles.workoutModels}
@@ -27,12 +52,16 @@ class WorkoutScreen extends React.Component {
       <View style={styles.container}>
         <View style={styles.searchSection}>
           <SearchBar
+            onChangeText={text => this.toggleSearchView(text)}
+            onClear={() => this.clearSearch()}
             inputStyle={styles.search_bar_input}
             containerStyle={styles.search_bar}
             placeholder="Search..."
             platform="default"
             lightTheme={true}
             round={true}
+            value={this.state.search}
+            searchIcon={{ size: 24 }}
           />
         </View>
         <ScrollView style={styles.workoutSection}>{workoutButtons}</ScrollView>

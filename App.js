@@ -12,7 +12,7 @@ export default class App extends React.Component {
     };
   }
 
-  async componentDidMount(){
+  async componentDidMount() {
     let wData = await this.getWorkoutData();
     wData = [...new Set(wData.map(arr => arr[0]))]
     this.setState({
@@ -27,7 +27,7 @@ export default class App extends React.Component {
   };
 
   getWorkoutData = async () => {
-    const res = await fetch('https://fb65e02b.ngrok.io/workoutData');
+    const res = await fetch('http://d76d7440.ngrok.io/workoutData');
     const workoutData = await res.json();
     return workoutData;
   }
@@ -35,7 +35,7 @@ export default class App extends React.Component {
   render() {
     if (this.state.accepted === true) {
       //console.log(this.state.workoutNames);
-      return <NavBar screenProps={{workoutNames:this.state.workoutNames}}></NavBar>;
+      return <NavBar screenProps={{ workoutNames: this.state.workoutNames }}></NavBar>;
     } else {
       return <WaiverScreen acceptWaiver={this.acceptWaiver}></WaiverScreen>;
     }
