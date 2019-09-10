@@ -19,14 +19,14 @@ const Nav = createAppContainer(
       Workout: {
         screen: WorkoutScreen,
         navigationOptions: {
-          tabBarIcon: () => <Icon name="book" type="antdesign"/>
+          tabBarIcon: () => <Icon name="dumbbell" type="material-community" />
         }
       },
 
       Scale: {
         screen: ScaleScreen,
         navigationOptions: {
-          tabBarIcon: () => <Icon name="book" type="antdesign" />
+          tabBarIcon: () => <Icon name="scale-bathroom" type="material-community" />
         }
       }
     },
