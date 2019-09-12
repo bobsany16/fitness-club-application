@@ -8,15 +8,20 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       accepted: false,
-      workoutNames: []
+      workoutData: [],
+      workoutNames: [],
+      exerciseData: []
     };
   }
 
   async componentDidMount() {
     let wData = await this.getWorkoutData();
-    wData = [...new Set(wData.map(arr => arr[0]))]
+    let wNames = [...new Set(wData.map(arr => arr[0]))]
+    let eData = await this.getExerciseData();
     this.setState({
-      workoutNames: wData
+      workoutData: wData,
+      workoutNames: wNames,
+      exerciseData: eData
     })
   }
 
@@ -27,14 +32,20 @@ export default class App extends React.Component {
   };
 
   getWorkoutData = async () => {
-    const res = await fetch('http://d76d7440.ngrok.io/workoutData');
+    const res = await fetch('http://78f719b6.ngrok.io/workoutData');
     const workoutData = await res.json();
     return workoutData;
   }
 
+  getExerciseData = async () => {
+    const res = await fetch('http://78f719b6.ngrok.io/exerciseData');
+    const exerciseData = await res.json();
+    return exerciseData;
+  }
+
   render() {
     if (this.state.accepted === true) {
-      return <NavBar screenProps={{ workoutNames: this.state.workoutNames }}></NavBar>;
+      return <NavBar screenProps={{ workoutData: this.state.workoutData, workoutNames: this.state.workoutNames, exerciseData: this.state.exerciseData }}></NavBar>;
     } else {
       return <WaiverScreen acceptWaiver={this.acceptWaiver}></WaiverScreen>;
     }

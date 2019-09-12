@@ -1,7 +1,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, Linking, Text, View } from "react-native";
 import { Button } from "react-native-elements";
-import LinearGradient from "react-native-linear-gradient";
 
 class WaiverScreen extends React.Component {
   constructor(props) {
