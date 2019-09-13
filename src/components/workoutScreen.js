@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableOpacity, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button, SearchBar } from "react-native-elements";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 class WorkoutScreen extends React.Component {
   constructor(props) {
@@ -103,7 +104,7 @@ class WorkoutScreen extends React.Component {
         <TouchableOpacity
           key={exName}
         >
-          <View style={styles.workoutModels}>
+          <View style={styles.exerciseModels}>
             <Text
               key={exName}
               style={{
@@ -135,8 +136,20 @@ class WorkoutScreen extends React.Component {
             />
           </View>
           <ScrollView style={styles.workoutSection}>
+            <View style={{ paddingLeft: 20, flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Icon
+                name="chevron-left"
+                size={25}
+                color="black"
+                onPress={() => { this.goBackToWorkoutScreen() }}
+              />
+              <View style={{ paddingRight: 20 }}>
+                <Text style={{ fontSize: 20 }}>
+                  {this.state.currentWorkout}
+                </Text>
+              </View>
+            </View>
             {exerciseButtons}
-            <Button raised={true} title="Go Back to Workouts" type="solid" onPress={() => { this.goBackToWorkoutScreen() }} />
           </ScrollView>
         </View>
       )
@@ -229,7 +242,18 @@ const styles = StyleSheet.create({
     fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 50,
     letterSpacing: 10
-  }
+  },
+
+  exerciseModels: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 100,
+    //borderRadius: 45,
+    backgroundColor: "#b2bec3",
+    //marginHorizontal: 20,
+    marginVertical: 10
+  },
 });
 
 export default WorkoutScreen;
