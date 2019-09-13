@@ -45,28 +45,6 @@ class WorkoutScreen extends React.Component {
     });
   };
 
-  toggleExerciseSearchView = text => {
-    const exerNames = this.getExerciseNames(this.state.currentWorkout);
-    let exNames = [];
-    for (let name of exerNames) {
-      if (name.includes(text)) {
-        exNames.push(name);
-      }
-    }
-    this.setState({
-      search: text,
-      exerciseNames: exNames
-    });
-  };
-
-  clearExerciseSearch = () => {
-    const exerNames = this.getExerciseNames(this.state.currentWorkout);
-    this.setState({
-      search: "",
-      exerciseNames: exerNames
-    });
-  };
-
   getExerciseNames = workoutName => {
     let exerciseIds = this.state.workoutData.map(workout => {
       if (workout[0] === workoutName) {
