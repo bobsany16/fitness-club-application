@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, WebView, TouchableOpacity, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Modal, WebView, TouchableOpacity, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SearchBar } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -170,62 +170,60 @@ class WorkoutScreen extends React.Component {
       );
     }
 
-    if (this.state.showExerciseScreen === true) {
-      let exerciseButtons = this.createButtons(this.state.exerciseNames)
-      let exDataObj = {};
-      let youtubeURL = '';
-      if (this.state.currentExercise !== '') {
-        exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
-        youtubeURL = exDataObj[0][2];
-      }
-      return (
-        <View style={styles.container}>
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={this.state.modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
-            <View style={{ height: 650 }}>
-              <WebView
-                javaScriptEnabled={true}
-                domStorageEnabled={true}
-                source={{ uri: youtubeURL }}
-              />
-              <View style={{ paddingTop: 20 }}>
-                <Icon
-                  name="chevron-left"
-                  size={25}
-                  color="black"
-                  onPress={() => {
-                    this.setModalVisible(false);
-                  }}
-                />
-              </View>
-            </View>
-          </Modal>
-          <View style={styles.backToWorkoutScrn}>
-            <Icon
-              name="chevron-left"
-              size={25}
-              color="black"
-              onPress={() => {
-                this.showWorkoutScreen();
-              }}
+  if (this.state.showExerciseScreen === true) {
+    let exerciseButtons = this.createButtons(this.state.exerciseNames)
+    let exDataObj = {};
+    let youtubeURL = '';
+    if (this.state.currentExercise !== '') {
+      exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
+      youtubeURL = exDataObj[0][2];
+    }
+    return (
+      <View style={styles.container}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.modalVisible}
+          >
+          <View style={{ height: Dimensions.get('window').height }}>
+            <WebView
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              source={{ uri: youtubeURL }}
             />
-            <View style={{ paddingRight: 20 }}>
-              <Text style={styles.currentWorkoutTitle}>
-                {this.state.currentWorkout}
-              </Text>
+            <View style={{ paddingTop: 20 }}>
+              <Icon
+                name="chevron-left"
+                size={25}
+                color="black"
+                onPress={() => {
+                  this.setModalVisible(false);
+                }}
+              />
             </View>
           </View>
-          <ScrollView style={styles.workoutSection}>
-            {exerciseButtons}
-          </ScrollView>
+        </Modal>
+        <View style={styles.backToWorkoutScrn}>
+          <Icon
+            name="chevron-left"
+            size={25}
+            color="black"
+            onPress={() => {
+              this.showWorkoutScreen();
+            }}
+          />
+          <View style={{ paddingRight: 20 }}>
+            <Text style={styles.currentWorkoutTitle}>
+              {this.state.currentWorkout}
+            </Text>
+          </View>
         </View>
-      );
-    }
+        <ScrollView style={styles.workoutSection}>
+          {exerciseButtons}
+        </ScrollView>
+      </View>
+    );
+  }
   }
 }
 
@@ -282,7 +280,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     flexDirection: "row",
     justifyContent: "space-between",
-    height: "15%",
+    height: "12%",
     alignItems: "flex-end",
     marginBottom: 10
   },
