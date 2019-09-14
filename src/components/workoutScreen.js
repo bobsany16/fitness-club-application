@@ -1,5 +1,5 @@
 import React from "react";
-import { WebView, TouchableOpacity, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, WebView, TouchableOpacity, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SearchBar } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -16,7 +16,7 @@ class WorkoutScreen extends React.Component {
       currentExercise: "",
       showWorkoutScreen: true,
       showExerciseScreen: false,
-      showYoutubeVideoScreen: false
+      modalVisible: false,
     };
   }
 
@@ -30,6 +30,11 @@ class WorkoutScreen extends React.Component {
       exerciseData: this.props.screenProps.exerciseData
     });
   }
+
+  setModalVisible(visibility) {
+    this.setState({ modalVisible: visibility });
+  }
+
 
   getExerciseNames = workoutName => {
     let exerciseIds = this.state.workoutData.map(workout => {
@@ -52,26 +57,21 @@ class WorkoutScreen extends React.Component {
     this.setState({
       exerciseNames: exerNames,
       showExerciseScreen: true,
-      showWorkoutScreen: false,
-      showYoutubeVideoScreen: false
+      showWorkoutScreen: false
     });
   };
 
   showWorkoutScreen = () => {
     this.setState({
       showWorkoutScreen: true,
-      showExerciseScreen: false,
-      showYoutubeVideoScreen: false
+      showExerciseScreen: false
     });
   };
 
-  showYoutubeVideoScreen = (exerciseName) => {
+  setExerciseName = (exerciseName) => {
     this.setState({
-      showWorkoutScreen: false,
-      showExerciseScreen: false,
-      showYoutubeVideoScreen: true,
       currentExercise: exerciseName
-    });
+    })
   }
 
   toggleWorkoutSearchView = text => {
@@ -94,26 +94,59 @@ class WorkoutScreen extends React.Component {
     });
   };
 
-  render() {
+  createButtons = (names) => {
+    let buttons = [];
     if (this.state.showWorkoutScreen === true) {
-      let workoutButtons = [];
-      workoutButtons = this.state.workoutNames.map(workoutName => (
+      buttons = names.map(workoutName =>
         <TouchableOpacity
           key={workoutName}
           onPress={() => {
-            this.setState({
-              currentWorkout: workoutName
-            });
-            this.showExerciseScreen(workoutName);
+            this.onPressWorkouts(workoutName);
           }}
+
         >
           <View style={styles.workoutModels}>
             <Text key={workoutName} style={styles.workoutTitles}>
               {workoutName}
             </Text>
           </View>
-        </TouchableOpacity>
-      ));
+        </TouchableOpacity>)
+    } else if (this.state.showExerciseScreen === true) {
+      buttons = names.map(exName =>
+        <TouchableOpacity
+          key={exName}
+          onPress={() => {
+            this.onPressExercises(exName);
+          }}
+        >
+          <View style={styles.exerciseModels}>
+            <Text
+              key={exName}
+              style={styles.workoutTitles}
+            >
+              {exName}
+            </Text>
+          </View>
+        </TouchableOpacity>)
+    }
+    return buttons;
+  }
+
+  onPressWorkouts = (workoutName) => {
+    this.setState({
+      currentWorkout: workoutName
+    });
+    this.showExerciseScreen(workoutName);
+  }
+
+  onPressExercises = (exName) => {
+    this.setModalVisible(true);
+    this.setExerciseName(exName);
+  }
+
+  render() {
+    if (this.state.showWorkoutScreen === true) {
+      let workoutButtons = this.createButtons(this.state.workoutNames);
       return (
         <View style={styles.container}>
           <View style={styles.searchSection}>
@@ -136,27 +169,42 @@ class WorkoutScreen extends React.Component {
         </View>
       );
     }
+
     if (this.state.showExerciseScreen === true) {
-      let exerciseButtons = [];
-      exerciseButtons = this.state.exerciseNames.map(exName => (
-        <TouchableOpacity
-          key={exName}
-          onPress={() => {
-            this.showYoutubeVideoScreen(exName);
-          }}
-        >
-          <View style={styles.exerciseModels}>
-            <Text
-              key={exName}
-              style={styles.workoutTitles}
-            >
-              {exName}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ));
+      let exerciseButtons = this.createButtons(this.state.exerciseNames)
+      let exDataObj = {};
+      let youtubeURL = '';
+      if (this.state.currentExercise !== '') {
+        exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
+        youtubeURL = exDataObj[0][2];
+      }
       return (
         <View style={styles.container}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={this.state.modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+            }}>
+            <View style={{ height: 650 }}>
+              <WebView
+                javaScriptEnabled={true}
+                domStorageEnabled={true}
+                source={{ uri: youtubeURL }}
+              />
+              <View style={{ paddingTop: 20 }}>
+                <Icon
+                  name="chevron-left"
+                  size={25}
+                  color="black"
+                  onPress={() => {
+                    this.setModalVisible(false);
+                  }}
+                />
+              </View>
+            </View>
+          </Modal>
           <View style={styles.backToWorkoutScrn}>
             <Icon
               name="chevron-left"
@@ -177,26 +225,6 @@ class WorkoutScreen extends React.Component {
           </ScrollView>
         </View>
       );
-    }
-    if (this.state.showYoutubeVideoScreen === true) {
-      let exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
-      return (
-        <View style={{ height: 300 }}>
-          <WebView
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            source={{ uri: `${exDataObj[0][2]}` }}
-          />
-          <Icon
-            name="chevron-left"
-            size={25}
-            color="black"
-            onPress={() => {
-              this.showExerciseScreen(this.state.currentWorkout);
-            }}
-          />
-        </View>
-      )
     }
   }
 }
