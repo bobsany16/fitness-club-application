@@ -170,60 +170,66 @@ class WorkoutScreen extends React.Component {
       );
     }
 
-  if (this.state.showExerciseScreen === true) {
-    let exerciseButtons = this.createButtons(this.state.exerciseNames)
-    let exDataObj = {};
-    let youtubeURL = '';
-    if (this.state.currentExercise !== '') {
-      exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
-      youtubeURL = exDataObj[0][2];
-    }
-    return (
-      <View style={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={this.state.modalVisible}
+    if (this.state.showExerciseScreen === true) {
+      let exerciseButtons = this.createButtons(this.state.exerciseNames)
+      let exDataObj = {};
+      let youtubeURL = '';
+      if (this.state.currentExercise !== '') {
+        exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
+        youtubeURL = exDataObj[0][2];
+      }
+      return (
+        <View style={styles.container}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={this.state.modalVisible}
           >
-          <View style={{ height: Dimensions.get('window').height }}>
-            <WebView
-              javaScriptEnabled={true}
-              domStorageEnabled={true}
-              source={{ uri: youtubeURL }}
-            />
-            <View style={{ paddingTop: 20 }}>
-              <Icon
-                name="chevron-left"
-                size={25}
-                color="black"
-                onPress={() => {
-                  this.setModalVisible(false);
-                }}
+            <View style={{ height: Dimensions.get('window').height }}>
+              <View style={styles.backToWorkoutScrn}>
+                <Icon
+                  name="chevron-left"
+                  size={25}
+                  color="black"
+                  onPress={() => {
+                    this.setModalVisible(false);
+                  }}
+                />
+                <View style={{ paddingRight: 20 }}>
+                  <Text style={styles.currentWorkoutTitle}>
+                    {this.state.currentExercise}
+                  </Text>
+                </View>
+              </View>
+              <WebView
+                javaScriptEnabled={true}
+                domStorageEnabled={true}
+                source={{ uri: youtubeURL }}
+                mediaPlaybackRequiresUserAction={false}
               />
             </View>
+          </Modal >
+          <View style={styles.backToWorkoutScrn}>
+            <Icon
+              name="chevron-left"
+              size={25}
+              color="black"
+              onPress={() => {
+                this.showWorkoutScreen();
+              }}
+            />
+            <View style={{ paddingRight: 20 }}>
+              <Text style={styles.currentWorkoutTitle}>
+                {this.state.currentWorkout}
+              </Text>
+            </View>
           </View>
-        </Modal>
-        <View style={styles.backToWorkoutScrn}>
-          <Icon
-            name="chevron-left"
-            size={25}
-            color="black"
-            onPress={() => {
-              this.showWorkoutScreen();
-            }}
-          />
-          <View style={{ paddingRight: 20 }}>
-            <Text style={styles.currentWorkoutTitle}>
-              {this.state.currentWorkout}
-            </Text>
-          </View>
-        </View>
-        <ScrollView style={styles.workoutSection}>
-          {exerciseButtons}
-        </ScrollView>
-      </View>
-    );
-  }
+          <ScrollView style={styles.workoutSection}>
+            {exerciseButtons}
+          </ScrollView>
+        </View >
+      );
+    }
   }
 }
 
@@ -263,7 +269,7 @@ const styles = StyleSheet.create({
   },
 
   workoutTitles: {
-    fontFamily: "AppleSDGothicNeo-Light",
+    //fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 25
   },
 
@@ -286,7 +292,7 @@ const styles = StyleSheet.create({
   },
 
   currentWorkoutTitle: {
-    fontFamily: "AppleSDGothicNeo-Light",
+    //fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 20
   }
 });

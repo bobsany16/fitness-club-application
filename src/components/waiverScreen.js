@@ -108,12 +108,12 @@ const styles = StyleSheet.create({
 
   mainTitle2: {
     fontSize: 40,
-    fontFamily: "AppleSDGothicNeo-Bold",
+    //fontFamily: "AppleSDGothicNeo-Bold",
     letterSpacing: 5
   },
   mainTitle: {
     fontSize: 45,
-    fontFamily: "AppleSDGothicNeo-Light"
+    //fontFamily: "AppleSDGothicNeo-Light"
   },
 
   waiver: {
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
   },
 
   waiverScroller: {
-    fontFamily: "AppleSDGothicNeo-Light",
+    //fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 15,
     margin: 20
   },
 
   waiverTitle: {
-    fontFamily: "AppleSDGothicNeo-Medium",
+    //fontFamily: "AppleSDGothicNeo-Medium",
     fontSize: 17,
     alignItems: "flex-start",
     letterSpacing: 2,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
 
   fontButton: {
-    fontFamily: "AppleSDGothicNeo-Bold",
+    //fontFamily: "AppleSDGothicNeo-Bold",
     fontSize: 40
   },
 
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     color: "#0185EA",
     flex: 1,
     textDecorationLine: "underline",
-    fontFamily: "AppleSDGothicNeo-Light"
+    //fontFamily: "AppleSDGothicNeo-Light"
   },
 
   policySection: {
