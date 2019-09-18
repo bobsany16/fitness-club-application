@@ -33,8 +33,8 @@ const Nav = createAppContainer(
 
     {
       tabBarOptions: {
-        activeTintColor: 'tomato',
-        inactiveTintColor: 'gray'
+        activeTintColor: '#FFC107',
+        inactiveTintColor: 'black'
       }
     }
   )

@@ -1,5 +1,14 @@
 import React from "react";
-import { Dimensions, Modal, WebView, TouchableOpacity, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  Modal,
+  WebView,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import { SearchBar } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -16,14 +25,14 @@ class WorkoutScreen extends React.Component {
       currentExercise: "",
       showWorkoutScreen: true,
       showExerciseScreen: false,
-      modalVisible: false,
+      modalVisible: false
     };
   }
 
   async componentDidMount() {
     this.setState({
       showWorkoutScreen: true
-    })
+    });
     this.setState({
       workoutData: this.props.screenProps.workoutData,
       workoutNames: this.props.screenProps.workoutNames,
@@ -34,7 +43,6 @@ class WorkoutScreen extends React.Component {
   setModalVisible(visibility) {
     this.setState({ modalVisible: visibility });
   }
-
 
   getExerciseNames = workoutName => {
     let exerciseIds = this.state.workoutData.map(workout => {
@@ -68,11 +76,11 @@ class WorkoutScreen extends React.Component {
     });
   };
 
-  setExerciseName = (exerciseName) => {
+  setExerciseName = exerciseName => {
     this.setState({
       currentExercise: exerciseName
-    })
-  }
+    });
+  };
 
   toggleWorkoutSearchView = text => {
     let wNames = [];
@@ -94,55 +102,91 @@ class WorkoutScreen extends React.Component {
     });
   };
 
-  createButtons = (names) => {
+  createButtons = names => {
     let buttons = [];
+    let myColors = ["#000000", "#FFC107"];
+    let myTextColors = ["#FFFFFF", "#000000"];
     if (this.state.showWorkoutScreen === true) {
-      buttons = names.map(workoutName =>
+      buttons = names.map((workoutName, index) => (
         <TouchableOpacity
           key={workoutName}
           onPress={() => {
             this.onPressWorkouts(workoutName);
           }}
-
         >
-          <View style={styles.workoutModels}>
-            <Text key={workoutName} style={styles.workoutTitles}>
+          <View
+            style={{
+              backgroundColor: myColors[index % myColors.length],
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 200,
+              borderRadius: 45,
+              marginHorizontal: 20,
+              marginVertical: 10
+            }}
+          >
+            <Text
+              key={workoutName}
+              style={{
+                color: myTextColors[index % myTextColors.length],
+                fontSize: 35,
+                textTransform: "uppercase",
+                letterSpacing: 2
+              }}
+            >
               {workoutName}
             </Text>
           </View>
-        </TouchableOpacity>)
+        </TouchableOpacity>
+      ));
     } else if (this.state.showExerciseScreen === true) {
-      buttons = names.map(exName =>
+      buttons = names.map((exName, index) => (
         <TouchableOpacity
           key={exName}
           onPress={() => {
             this.onPressExercises(exName);
           }}
         >
-          <View style={styles.exerciseModels}>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 100,
+              backgroundColor: myColors[index % myColors.length],
+              marginVertical: 10
+            }}
+          >
             <Text
               key={exName}
-              style={styles.workoutTitles}
+              style={{
+                color: myTextColors[index % myTextColors.length],
+                fontSize: 25,
+                textTransform: "uppercase",
+                letterSpacing: 2
+              }}
             >
               {exName}
             </Text>
           </View>
-        </TouchableOpacity>)
+        </TouchableOpacity>
+      ));
     }
     return buttons;
-  }
+  };
 
-  onPressWorkouts = (workoutName) => {
+  onPressWorkouts = workoutName => {
     this.setState({
       currentWorkout: workoutName
     });
     this.showExerciseScreen(workoutName);
-  }
+  };
 
-  onPressExercises = (exName) => {
+  onPressExercises = exName => {
     this.setModalVisible(true);
     this.setExerciseName(exName);
-  }
+  };
 
   render() {
     if (this.state.showWorkoutScreen === true) {
@@ -171,11 +215,13 @@ class WorkoutScreen extends React.Component {
     }
 
     if (this.state.showExerciseScreen === true) {
-      let exerciseButtons = this.createButtons(this.state.exerciseNames)
+      let exerciseButtons = this.createButtons(this.state.exerciseNames);
       let exDataObj = {};
-      let youtubeURL = '';
-      if (this.state.currentExercise !== '') {
-        exDataObj = this.state.exerciseData.filter(exArr => exArr[1] === this.state.currentExercise);
+      let youtubeURL = "";
+      if (this.state.currentExercise !== "") {
+        exDataObj = this.state.exerciseData.filter(
+          exArr => exArr[1] === this.state.currentExercise
+        );
         youtubeURL = exDataObj[0][2];
       }
       return (
@@ -185,7 +231,7 @@ class WorkoutScreen extends React.Component {
             transparent={false}
             visible={this.state.modalVisible}
           >
-            <View style={{ height: Dimensions.get('window').height }}>
+            <View style={{ height: Dimensions.get("window").height }}>
               <View style={styles.backToWorkoutScrn}>
                 <Icon
                   name="chevron-left"
@@ -208,7 +254,7 @@ class WorkoutScreen extends React.Component {
                 mediaPlaybackRequiresUserAction={false}
               />
             </View>
-          </Modal >
+          </Modal>
           <View style={styles.backToWorkoutScrn}>
             <Icon
               name="chevron-left"
@@ -227,7 +273,7 @@ class WorkoutScreen extends React.Component {
           <ScrollView style={styles.workoutSection}>
             {exerciseButtons}
           </ScrollView>
-        </View >
+        </View>
       );
     }
   }
@@ -257,30 +303,25 @@ const styles = StyleSheet.create({
     height: "85%"
   },
 
-  workoutModels: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 200,
-    borderRadius: 45,
-    backgroundColor: "#b2bec3",
-    marginHorizontal: 20,
-    marginVertical: 10
-  },
+  // workoutModels: {
+  //   flexDirection: "column",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   height: 200,
+  //   borderRadius: 45,
+  //   backgroundColor: "#b2bec3",
+  //   marginHorizontal: 20,
+  //   marginVertical: 10
+  // },
 
-  workoutTitles: {
-    //fontFamily: "AppleSDGothicNeo-Light",
-    fontSize: 25
-  },
-
-  exerciseModels: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 100,
-    backgroundColor: "#b2bec3",
-    marginVertical: 10
-  },
+  // exerciseModels: {
+  //   flexDirection: "column",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   height: 100,
+  //   backgroundColor: "#b2bec3",
+  //   marginVertical: 10
+  // },
 
   backToWorkoutScrn: {
     paddingLeft: 20,
