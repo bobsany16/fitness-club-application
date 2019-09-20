@@ -43,7 +43,7 @@ class WorkoutScreen extends React.Component {
       workoutNames: wNames,
       exerciseData: exData,
       searchWorkoutNames: wNames,
-      loading:false
+      loading: false
     });
   }
 
@@ -128,6 +128,17 @@ class WorkoutScreen extends React.Component {
             }}
           >
             <Text
+              key={index}
+              style={{
+                color: myTextColors[index % myTextColors.length],
+                fontSize: 15,
+                textTransform: "uppercase",
+                letterSpacing: 2
+              }}
+            >
+              Day {index+1}
+            </Text>
+            <Text
               key={workoutName}
               style={{
                 color: myTextColors[index % myTextColors.length],
@@ -189,7 +200,7 @@ class WorkoutScreen extends React.Component {
 
   onPressExercises = async (index) => {
     this.setState({
-      loading:true
+      loading: true
     });
     let exId = index + 1;
     const res = await fetch(`https://429aa4d6.ngrok.io/exercise/${exId}/youtubeLink`);
@@ -197,7 +208,7 @@ class WorkoutScreen extends React.Component {
     let youtubeLink = exObj.youtubeUrl;
     this.setState({
       youtubeURL: youtubeLink,
-      loading:false
+      loading: false
     })
     this.setModalVisible(true);
   };
