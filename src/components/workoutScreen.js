@@ -7,7 +7,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  ActivityIndicator
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -16,89 +17,89 @@ class WorkoutScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      workoutData: [],
       workoutNames: [],
+      searchWorkoutNames: [],
       exerciseData: [],
       exerciseNames: [],
       search: "",
       currentWorkout: "",
       currentExercise: "",
+      youtubeURL: "",
       showWorkoutScreen: true,
       showExerciseScreen: false,
-      modalVisible: false
+      modalVisible: false,
+      loading: false
     };
   }
 
   async componentDidMount() {
     this.setState({
-      showWorkoutScreen: true
-    });
+      loading: true
+    })
+    const wNames = await this.getWorkoutNames();
+    const exData = await this.getExerciseData();
     this.setState({
-      workoutData: this.props.screenProps.workoutData,
-      workoutNames: this.props.screenProps.workoutNames,
-      exerciseData: this.props.screenProps.exerciseData
+      showWorkoutScreen: true,
+      workoutNames: wNames,
+      exerciseData: exData,
+      searchWorkoutNames: wNames,
+      loading:false
     });
   }
+
+  getWorkoutNames = async () => {
+    const res = await fetch('http://429aa4d6.ngrok.io/workoutNames');
+    const workoutNames = await res.json();
+    return workoutNames
+  }
+
+  getExerciseData = async () => {
+    const res = await fetch('http://429aa4d6.ngrok.io/exerciseData');
+    const exerciseData = await res.json();
+    return exerciseData;
+  }
+
+  getExerciseNamesByWorkout = async (index) => {
+    let workoutId = index + 1;
+    const res = await fetch(`http://429aa4d6.ngrok.io/workout/${workoutId}/exercises`);
+    let exerciseNames = await res.json();
+    return exerciseNames;
+  };
 
   setModalVisible(visibility) {
     this.setState({ modalVisible: visibility });
-  }
-
-  getExerciseNames = workoutName => {
-    let exerciseIds = this.state.workoutData.map(workout => {
-      if (workout[0] === workoutName) {
-        return workout[1];
-      }
-    });
-    exerciseIds = [...new Set(exerciseIds.filter(exId => exId !== undefined))];
-    let exerNames = this.state.exerciseData.map(exercise => {
-      if (exerciseIds.includes(exercise[0])) {
-        return exercise[1];
-      }
-    });
-    exerNames = [...new Set(exerNames.filter(exName => exName !== undefined))];
-    return exerNames;
   };
 
-  showExerciseScreen = async workoutName => {
-    const exerNames = await this.getExerciseNames(workoutName);
+  showExerciseScreen = async (workoutId) => {
+    this.setState({
+      loading: true
+    })
+    const exerNames = await this.getExerciseNamesByWorkout(workoutId);
     this.setState({
       exerciseNames: exerNames,
       showExerciseScreen: true,
-      showWorkoutScreen: false
-    });
-  };
-
-  showWorkoutScreen = () => {
-    this.setState({
-      showWorkoutScreen: true,
-      showExerciseScreen: false
-    });
-  };
-
-  setExerciseName = exerciseName => {
-    this.setState({
-      currentExercise: exerciseName
+      showWorkoutScreen: false,
+      loading: false
     });
   };
 
   toggleWorkoutSearchView = text => {
     let wNames = [];
-    for (let name of this.props.screenProps.workoutNames) {
+    for (let name of this.state.workoutNames) {
       if (name.includes(text)) {
         wNames.push(name);
       }
     }
     this.setState({
       search: text,
-      workoutNames: wNames
+      searchWorkoutNames: wNames
     });
   };
 
   clearWorkoutSearch = () => {
     this.setState({
       search: "",
-      workoutNames: this.props.screenProps.workoutNames
+      searchWorkoutNames: this.state.workoutNames
     });
   };
 
@@ -111,7 +112,7 @@ class WorkoutScreen extends React.Component {
         <TouchableOpacity
           key={workoutName}
           onPress={() => {
-            this.onPressWorkouts(workoutName);
+            this.onPressWorkouts(workoutName, index);
           }}
         >
           <View
@@ -145,7 +146,10 @@ class WorkoutScreen extends React.Component {
         <TouchableOpacity
           key={exName}
           onPress={() => {
-            this.onPressExercises(exName);
+            this.onPressExercises(index);
+            this.setState({
+              currentExercise: exName
+            })
           }}
         >
           <View
@@ -176,105 +180,120 @@ class WorkoutScreen extends React.Component {
     return buttons;
   };
 
-  onPressWorkouts = workoutName => {
+  onPressWorkouts = (workoutName, workoutId) => {
     this.setState({
       currentWorkout: workoutName
     });
-    this.showExerciseScreen(workoutName);
+    this.showExerciseScreen(workoutId);
   };
 
-  onPressExercises = exName => {
+  onPressExercises = async (index) => {
+    this.setState({
+      loading:true
+    });
+    let exId = index + 1;
+    const res = await fetch(`https://429aa4d6.ngrok.io/exercise/${exId}/youtubeLink`);
+    let exObj = await res.json();
+    let youtubeLink = exObj.youtubeUrl;
+    this.setState({
+      youtubeURL: youtubeLink,
+      loading:false
+    })
     this.setModalVisible(true);
-    this.setExerciseName(exName);
   };
 
   render() {
-    if (this.state.showWorkoutScreen === true) {
-      let workoutButtons = this.createButtons(this.state.workoutNames);
+    if (this.state.loading) {
       return (
-        <View style={styles.container}>
-          <View style={styles.searchSection}>
-            <SearchBar
-              onChangeText={text => this.toggleWorkoutSearchView(text)}
-              onClear={() => this.clearWorkoutSearch()}
-              inputStyle={styles.search_bar_input}
-              containerStyle={styles.search_bar}
-              placeholder="Search..."
-              platform="default"
-              lightTheme={true}
-              round={true}
-              value={this.state.search}
-              searchIcon={{ size: 24 }}
-            />
-          </View>
-          <ScrollView style={styles.workoutSection}>
-            {workoutButtons}
-          </ScrollView>
-        </View>
-      );
-    }
-
-    if (this.state.showExerciseScreen === true) {
-      let exerciseButtons = this.createButtons(this.state.exerciseNames);
-      let exDataObj = {};
-      let youtubeURL = "";
-      if (this.state.currentExercise !== "") {
-        exDataObj = this.state.exerciseData.filter(
-          exArr => exArr[1] === this.state.currentExercise
-        );
-        youtubeURL = exDataObj[0][2];
-      }
-      return (
-        <View style={styles.container}>
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={this.state.modalVisible}
-          >
-            <View style={{ height: Dimensions.get("window").height }}>
-              <View style={styles.backToWorkoutScrn}>
-                <Icon
-                  name="chevron-left"
-                  size={25}
-                  color="black"
-                  onPress={() => {
-                    this.setModalVisible(false);
-                  }}
-                />
-                <View style={{ paddingRight: 20 }}>
-                  <Text style={styles.currentWorkoutTitle}>
-                    {this.state.currentExercise}
-                  </Text>
-                </View>
-              </View>
-              <WebView
-                javaScriptEnabled={true}
-                domStorageEnabled={true}
-                source={{ uri: youtubeURL }}
-                mediaPlaybackRequiresUserAction={false}
+        <ActivityIndicator
+          animating={this.state.loading}
+          color='#000000'
+          size="large"
+          style={styles.activityIndicator} />
+      )
+    } else {
+      if (this.state.showWorkoutScreen === true) {
+        let workoutButtons = this.createButtons(this.state.searchWorkoutNames);
+        return (
+          <View style={styles.container}>
+            <View style={styles.searchSection}>
+              <SearchBar
+                onChangeText={text => this.toggleWorkoutSearchView(text)}
+                onClear={() => this.clearWorkoutSearch()}
+                inputStyle={styles.search_bar_input}
+                containerStyle={styles.search_bar}
+                placeholder="Search..."
+                platform="default"
+                lightTheme={true}
+                round={true}
+                value={this.state.search}
+                searchIcon={{ size: 24 }}
               />
             </View>
-          </Modal>
-          <View style={styles.backToWorkoutScrn}>
-            <Icon
-              name="chevron-left"
-              size={25}
-              color="black"
-              onPress={() => {
-                this.showWorkoutScreen();
-              }}
-            />
-            <View style={{ paddingRight: 20 }}>
-              <Text style={styles.currentWorkoutTitle}>
-                {this.state.currentWorkout}
-              </Text>
-            </View>
+            <ScrollView style={styles.workoutSection}>
+              {workoutButtons}
+            </ScrollView>
           </View>
-          <ScrollView style={styles.workoutSection}>
-            {exerciseButtons}
-          </ScrollView>
-        </View>
-      );
+        );
+      }
+
+      if (this.state.showExerciseScreen === true) {
+        let exerciseButtons = this.createButtons(this.state.exerciseNames);
+        return (
+          <View style={styles.container}>
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={this.state.modalVisible}
+            >
+              <View style={{ height: Dimensions.get("window").height }}>
+                <View style={styles.backToWorkoutScrn}>
+                  <Icon
+                    name="chevron-left"
+                    size={25}
+                    color="black"
+                    onPress={() => {
+                      this.setModalVisible(false);
+                    }}
+                  />
+                  <View style={{ paddingRight: 20 }}>
+                    <Text style={styles.currentWorkoutTitle}>
+                      {this.state.currentExercise}
+                    </Text>
+                  </View>
+                </View>
+                <WebView
+                  javaScriptEnabled={true}
+                  domStorageEnabled={true}
+                  source={{ uri: this.state.youtubeURL }}
+                  mediaPlaybackRequiresUserAction={false}
+                />
+              </View>
+            </Modal>
+            <View style={styles.backToWorkoutScrn}>
+              <Icon
+                name="chevron-left"
+                size={25}
+                color="black"
+                onPress={() => {
+                  this.setState({
+                    showWorkoutScreen: true,
+                    showExerciseScreen: false
+                  });
+                }}
+              />
+              <View style={{ paddingRight: 20 }}>
+                <Text style={styles.currentWorkoutTitle}>
+                  {this.state.currentWorkout}
+                </Text>
+              </View>
+            </View>
+            <ScrollView style={styles.workoutSection}>
+              {exerciseButtons}
+            </ScrollView>
+          </View>
+        );
+      }
     }
   }
 }
@@ -335,6 +354,13 @@ const styles = StyleSheet.create({
   currentWorkoutTitle: {
     //fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 20
+  },
+
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 80
   }
 });
 
