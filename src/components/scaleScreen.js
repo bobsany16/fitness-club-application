@@ -60,7 +60,7 @@ class ScaleScreen extends React.Component {
             keyboardType='number-pad'
             returnKeyType='done'
             placeholder='Enter Weight (In Pounds)'
-            onFocus={() => this.removeText(this.state.text)}
+            onFocus={() => this.removeText()}
             onChangeText={text => this.saveText(text)}
             value={this.state.text}
           />
