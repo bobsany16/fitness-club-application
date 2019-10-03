@@ -1,6 +1,8 @@
 import React from "react";
-import { Alert, Dimensions, Animated, Keyboard, UIManager, TextInput, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, AsyncStorage, Alert, Dimensions, Animated, Keyboard, UIManager, TextInput, StyleSheet, Text, View } from "react-native";
 import { Button } from 'react-native-elements'
+import { LineChart } from 'react-native-chart-kit';
+
 const { State: TextInputState } = TextInput;
 
 class ScaleScreen extends React.Component {
@@ -8,18 +10,54 @@ class ScaleScreen extends React.Component {
     super(props);
     this.state = {
       scaleData: [],
+      chartData: [],
       text: "",
-      shift: new Animated.Value(0)
+      shift: new Animated.Value(0),
+      loading: false
     };
   }
 
-  addToScaleData = (data) => {
-    if (data > 1000 || data.charAt(0) == 0) {
+  async componentDidMount() {
+    this.setState({
+      loading: true
+    })
+    let item = JSON.parse(await AsyncStorage.getItem('user'))
+    if (item !== null) {
+      this.setState({
+        chartData: item.map(str => {
+          return Number(str)
+        })
+      })
+    }
+    this.setState({
+      loading: false
+    })
+  }
+
+  addToScaleData = async (data) => {
+    if (data > 1000 || data.charAt(0) == 0 || data.charAt(0) == '') {
       Alert.alert('Weight Not Possible', 'Please enter valid weight',
         { text: 'OK', onPress: () => { } }, { cancelable: true });
     }
     else {
+      this.setState({
+        loading: true
+      })
       this.state.scaleData.push(data);
+      let item = JSON.parse(await AsyncStorage.getItem('user'))
+      if (item === null) {
+        await AsyncStorage.setItem('user', JSON.stringify(this.state.scaleData))
+      } else {
+        item.push(data);
+        await AsyncStorage.setItem('user', JSON.stringify(item))
+      }
+      item = JSON.parse(await AsyncStorage.getItem('user'))
+      this.setState({
+        chartData: item.map(str => {
+          return Number(str)
+        }),
+        loading: false
+      })
     }
   }
 
@@ -29,7 +67,6 @@ class ScaleScreen extends React.Component {
     })
 
   }
-
   removeText = () => {
     this.setState({
       text: ''
@@ -48,35 +85,71 @@ class ScaleScreen extends React.Component {
 
   render() {
     const { shift } = this.state;
-    return (
-      <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
-        <View style={{ paddingTop: '5%' }}>
-          <Text style={styles.scaleScreenTitle}>Your Scale</Text>
-        </View>
-        <View style={styles.enterTodayWeightBox}>
-          <Text style={styles.enterWeightText}>Enter Today's Weight</Text>
-          <TextInput
-            style={styles.textInputBox}
-            keyboardType='number-pad'
-            returnKeyType='done'
-            placeholder='Enter Weight (In Pounds)'
-            onFocus={() => this.removeText()}
-            onChangeText={text => this.saveText(text)}
-            value={this.state.text}
-          />
-          <Button
-            buttonStyle={{ backgroundColor: '#ffd700', borderRadius: 20 }}
-            title="Submit"
-            titleStyle={{ color: 'black', width: '50%' }}
-            onPress={() => {
-              this.addToScaleData(this.state.text);
-              this.removeText(this.state.text);
-            }}
-          />
-        </View>
-      </Animated.View>
-    );
+    if (this.state.loading) {
+      return (
+        <ActivityIndicator
+          animating={this.state.loading}
+          color='#000000'
+          size="large"
+          style={styles.activityIndicator} />
+      )
+    } else {
+      return (
+        <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
+          <View style={styles.titleAndChart}>
+            <Text style={styles.scaleScreenTitle}>Your Scale</Text>
+            <LineChart
+              data={{
+                datasets: [
+                  {
+                    data: this.state.chartData,
+                    strokeWidth: 3
+                  }
+                ]
+              }}
+              width={Dimensions.get("window").width}
+              height={Dimensions.get('window').height / 2.7}
+              chartConfig={{
+                backgroundGradientFrom: '#1E2923',
+                backgroundGradientTo: '#08130D',
+                decimalPlaces: 1,
+                color: () => '#00FFFF',
+                style: {
+                  borderRadius: 16
+                }
+              }}
+              style={{
+                marginVertical: 8,
+                borderRadius: 16
+              }}
+            />
+          </View>
+          <View style={styles.enterTodayWeightBox}>
+            <Text style={styles.enterWeightText}>Enter Today's Weight</Text>
+            <TextInput
+              style={styles.textInputBox}
+              keyboardType='number-pad'
+              returnKeyType='done'
+              placeholder='Enter Weight (In Pounds)'
+              onFocus={() => this.removeText(this.state.text)}
+              onChangeText={text => this.saveText(text)}
+              value={this.state.text}
+            />
+            <Button
+              buttonStyle={{ backgroundColor: '#ffd700', borderRadius: 20 }}
+              title="Submit"
+              titleStyle={{ color: 'black', width: '50%' }}
+              onPress={async () => {
+                await this.addToScaleData(this.state.text);
+                this.removeText(this.state.text);
+              }}
+            />
+          </View>
+        </Animated.View>
+      );
+    }
   }
+
 
   handleKeyboardDidShow = (event) => {
     const { height: windowHeight } = Dimensions.get('window');
@@ -92,7 +165,7 @@ class ScaleScreen extends React.Component {
       Animated.timing(
         this.state.shift,
         {
-          toValue: gap,
+          toValue: -250,
           useNativeDriver: true,
         }
       ).start();
@@ -114,21 +187,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    alignItems: 'center',
-    justifyContent: 'space-between'
+    alignItems: 'center'
   },
-
+  titleAndChart: {
+    flex: 1,
+    flexDirection: "column",
+    alignItems: 'center',
+    paddingTop: '5%'
+  },
   scaleScreenTitle: {
     fontSize: 50,
     fontWeight: '700'
   },
-
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 80
+  },
   enterWeightText: {
     fontSize: 30,
     fontWeight: '500',
     color: 'white'
   },
-
   textInputBox: {
     fontSize: 20,
     height: '25%',
