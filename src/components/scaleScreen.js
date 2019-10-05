@@ -124,16 +124,24 @@ class ScaleScreen extends React.PureComponent {
             { text: 'OK', onPress: () => { } }, { cancelable: true });
         }
       }
+      let past7Days = this.getLast7Days()
       item = JSON.parse(await AsyncStorage.getItem('user'))
       let cData = []
       for (var i = 0; i < item.length; i++) {
-        cData.push(Number(item[i].weight))
+        for (var j = 0; j < past7Days.length; j++) {
+          if (past7Days[j] === item[i].date) {
+            cData.push(Number(item[i].weight))
+          } else {
+            cData.push(null)
+          }
+        }
       }
       this.setState({
         chartData: cData,
         loading: false
       })
     }
+    console.log(this.state.chartData);
   }
 
   saveText = (newText) => {
