@@ -1,61 +1,136 @@
 import React from "react";
 import { ActivityIndicator, AsyncStorage, Alert, Dimensions, Animated, Keyboard, UIManager, TextInput, StyleSheet, Text, View } from "react-native";
 import { Button } from 'react-native-elements'
-import { LineChart } from 'react-native-chart-kit';
+import { Grid, LineChart, XAxis, YAxis } from 'react-native-svg-charts'
+import { Circle } from 'react-native-svg'
 
 const { State: TextInputState } = TextInput;
 
-class ScaleScreen extends React.Component {
+class ScaleScreen extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      scaleData: [],
       chartData: [],
       text: "",
       shift: new Animated.Value(0),
-      loading: false
+      loading: false,
+      todayDate: '',
+      yAxisData: []
     };
   }
 
   async componentDidMount() {
+    let currentDate = this.getCurrentDate();
     this.setState({
-      loading: true
+      todayDate: currentDate
     })
+    let past7Days = this.getLast7Days()
     let item = JSON.parse(await AsyncStorage.getItem('user'))
     if (item !== null) {
+      let cData = []
+      for (var i = 0; i < item.length; i++) {
+        for (var j = 0; j < past7Days.length; j++) {
+          if (past7Days[j] === item[i].date) {
+            cData.push(Number(item[i].weight))
+          } else {
+            cData.push(null)
+          }
+        }
+      }
       this.setState({
-        chartData: item.map(str => {
-          return Number(str)
-        })
+        chartData: cData
       })
     }
+    let yAxisInfo = await this.getXAxisForChart();
     this.setState({
-      loading: false
+      yAxisData: yAxisInfo
     })
+  }
+
+  getXAxisForChart() {
+    let past7Days = []
+    for (var i = 0; i < 7; i++) {
+      let dateObject = new Date();
+      dateObject.setDate(dateObject.getDate() - i);
+      let currentMonth = dateObject.getMonth() + 1;
+      let day = dateObject.getDate();
+      let year = dateObject.getFullYear();
+      let currentDate = `${currentMonth}/${day}/${year}`
+      past7Days.push(currentDate)
+    }
+    past7Days = past7Days.map(str => {
+      return str.substring(0, str.indexOf('/', 3))
+    }).reverse()
+    return past7Days;
+  }
+
+  getLast7Days() {
+    var last7Days = [];
+    for (var i = 0; i < 7; i++) {
+      var date = new Date();
+      date.setDate(date.getDate() - i);
+      let dateString = date.toString();
+      last7Days.push(dateString.substring(4, 15));
+    }
+    return (last7Days.reverse());
+  }
+
+  getCurrentDate = () => {
+    let dateObject = new Date();
+    let currentDate = dateObject.toString().substring(4, 15);
+    return currentDate;
   }
 
   addToScaleData = async (data) => {
     if (data > 1000 || data.charAt(0) == 0 || data.charAt(0) == '') {
       Alert.alert('Weight Not Possible', 'Please enter valid weight',
         { text: 'OK', onPress: () => { } }, { cancelable: true });
-    }
-    else {
-      this.setState({
-        loading: true
-      })
-      this.state.scaleData.push(data);
+    } else {
       let item = JSON.parse(await AsyncStorage.getItem('user'))
       if (item === null) {
-        await AsyncStorage.setItem('user', JSON.stringify(this.state.scaleData))
+        let newArray = [];
+        newArray.push({
+          date: this.state.todayDate,
+          weight: data
+        })
+        await AsyncStorage.setItem('user', JSON.stringify(newArray))
+      } else if (item.length < 7) {
+        itemDate = item.filter(eachItem => {
+          return eachItem.date === this.state.todayDate
+        })
+        if (itemDate.length < 1 || itemDate === undefined) {
+          item.push({
+            date: this.state.todayDate,
+            weight: data
+          })
+          await AsyncStorage.setItem('user', JSON.stringify(item))
+        } else {
+          Alert.alert('Not Possible', `You have entered a date today already.`,
+            { text: 'OK', onPress: () => { } }, { cancelable: true });
+        }
       } else {
-        item.push(data);
-        await AsyncStorage.setItem('user', JSON.stringify(item))
+        itemDate = item.filter(eachItem => {
+          return eachItem.date === this.state.todayDate
+        })
+        if (itemDate.length < 1 || itemDate === undefined) {
+          item.shift();
+          item.push({
+            date: this.state.todayDate,
+            weight: data
+          });
+          await AsyncStorage.setItem('user', JSON.stringify(item))
+        } else {
+          Alert.alert('Not Possible', `You have entered a date today already.`,
+            { text: 'OK', onPress: () => { } }, { cancelable: true });
+        }
       }
       item = JSON.parse(await AsyncStorage.getItem('user'))
+      let cData = []
+      for (var i = 0; i < item.length; i++) {
+        cData.push(Number(item[i].weight))
+      }
       this.setState({
-        chartData: item.map(str => {
-          return Number(str)
-        }),
+        chartData: cData,
         loading: false
       })
     }
@@ -82,74 +157,6 @@ class ScaleScreen extends React.Component {
     this.keyboardDidShowSub.remove();
     this.keyboardDidHideSub.remove();
   }
-
-  render() {
-    const { shift } = this.state;
-    if (this.state.loading) {
-      return (
-        <ActivityIndicator
-          animating={this.state.loading}
-          color='#000000'
-          size="large"
-          style={styles.activityIndicator} />
-      )
-    } else {
-      return (
-        <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
-          <View style={styles.titleAndChart}>
-            <Text style={styles.scaleScreenTitle}>Your Scale</Text>
-            <LineChart
-              data={{
-                datasets: [
-                  {
-                    data: this.state.chartData,
-                    strokeWidth: 3
-                  }
-                ]
-              }}
-              width={Dimensions.get("window").width}
-              height={Dimensions.get('window').height / 2.7}
-              chartConfig={{
-                backgroundGradientFrom: '#1E2923',
-                backgroundGradientTo: '#08130D',
-                decimalPlaces: 1,
-                color: () => '#00FFFF',
-                style: {
-                  borderRadius: 16
-                }
-              }}
-              style={{
-                marginVertical: 8,
-                borderRadius: 16
-              }}
-            />
-          </View>
-          <View style={styles.enterTodayWeightBox}>
-            <Text style={styles.enterWeightText}>Enter Today's Weight</Text>
-            <TextInput
-              style={styles.textInputBox}
-              keyboardType='number-pad'
-              returnKeyType='done'
-              placeholder='Enter Weight (In Pounds)'
-              onFocus={() => this.removeText(this.state.text)}
-              onChangeText={text => this.saveText(text)}
-              value={this.state.text}
-            />
-            <Button
-              buttonStyle={{ backgroundColor: '#ffd700', borderRadius: 20 }}
-              title="Submit"
-              titleStyle={{ color: 'black', width: '50%' }}
-              onPress={async () => {
-                await this.addToScaleData(this.state.text);
-                this.removeText(this.state.text);
-              }}
-            />
-          </View>
-        </Animated.View>
-      );
-    }
-  }
-
 
   handleKeyboardDidShow = (event) => {
     const { height: windowHeight } = Dimensions.get('window');
@@ -180,6 +187,85 @@ class ScaleScreen extends React.Component {
         useNativeDriver: true,
       }
     ).start();
+  }
+
+  render() {
+    const data = this.state.chartData
+    const contentInset = { top: 10, bottom: 10, right: 10, left: 10 }
+    const xAxisHeight = 10
+    const { shift } = this.state;
+    const Decorator = ({ x, y, data }) => {
+      for (var index = 0; index < data.length; index++) {
+        let value = data[index];
+        if (value !== null) {
+          return (
+            <Circle
+              key={index}
+              cx={x(index)}
+              cy={y(value)}
+              r={4}
+              stroke={'rgb(134, 65, 244)'}
+              fill={'black'}
+            />
+          )
+        }
+      }
+    }
+    return (
+      <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
+        <View style={styles.titleAndChart}>
+          <Text style={styles.scaleScreenTitle}>Your Scale</Text>
+        </View>
+        <View style={{ height: Dimensions.get('window').height / 2.7, padding: 20, flexDirection: 'row' }}>
+          <YAxis
+            data={data}
+            style={{ marginBottom: xAxisHeight }}
+            contentInset={contentInset}
+            svg={{ fontSize: 10, fill: 'grey' }}
+            formatLabel={(value) => `${value}lbs`}
+          />
+          <View style={{ flex: 1 }}>
+            <LineChart
+              style={{ flex: 1 }}
+              data={data}
+              contentInset={contentInset}
+              svg={{ stroke: 'rgb(0, 0, 0)' }}
+            >
+              <Grid />
+              <Decorator />
+            </LineChart>
+            <XAxis
+              style={{ marginHorizontal: -10, height: xAxisHeight }}
+              data={data}
+              formatLabel={(value, index) => this.state.yAxisData[index]}
+              contentInset={{ left: 20, right: 20 }}
+              svg={{ fontSize: 10, fill: 'black' }}
+            />
+          </View>
+        </View>
+        <View style={styles.enterTodayWeightBox}>
+          <Text style={styles.enterWeightText}>Enter Today's Weight</Text>
+          <TextInput
+            style={styles.textInputBox}
+            keyboardType='number-pad'
+            returnKeyType='done'
+            placeholder='Enter Weight (In Pounds)'
+            onFocus={() => this.removeText(this.state.text)}
+            onChangeText={text => this.saveText(text)}
+            value={this.state.text}
+          />
+          <Button
+            buttonStyle={{ backgroundColor: '#ffd700', borderRadius: 20 }}
+            title="Submit"
+            titleStyle={{ color: 'black', width: '50%' }}
+            onPress={async () => {
+              await this.addToScaleData(this.state.text);
+              this.removeText(this.state.text);
+            }}
+          />
+        </View>
+      </Animated.View>
+    )
   }
 }
 
@@ -235,4 +321,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScaleScreen;
+export default ScaleScreen
