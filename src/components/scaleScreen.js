@@ -13,9 +13,9 @@ class ScaleScreen extends React.PureComponent {
       chartData: [],
       text: "",
       shift: new Animated.Value(0),
-      loading: false,
       todayDate: '',
-      yAxisData: []
+      xAxisData: [],
+      loading: false
     };
   }
 
@@ -25,25 +25,37 @@ class ScaleScreen extends React.PureComponent {
       todayDate: currentDate
     })
     let past7Days = this.getLast7Days()
+    this.setState({
+      loading: true
+    })
     let item = JSON.parse(await AsyncStorage.getItem('user'))
+    let dates = item.map(element => {
+      return element.date
+    })
     if (item !== null) {
       let cData = []
-      for (var i = 0; i < item.length; i++) {
-        for (var j = 0; j < past7Days.length; j++) {
-          if (past7Days[j] === item[i].date) {
-            cData.push(Number(item[i].weight))
-          } else {
-            cData.push(null)
-          }
+      for (var j = 0; j < past7Days.length; j++) {
+        if (dates.includes(past7Days[j])) {
+          let dateArray = item.filter(element => {
+            return element.date === past7Days[j]
+          })
+          let dateObj = dateArray[0]
+          let weight = dateObj.weight;
+          cData.push(Number(weight))
+        } else {
+          cData.push(null)
         }
+        this.setState({
+          chartData: cData
+        })
       }
-      this.setState({
-        chartData: cData
-      })
     }
-    let yAxisInfo = await this.getXAxisForChart();
     this.setState({
-      yAxisData: yAxisInfo
+      loading: false
+    })
+    let xAxisInfo = this.getXAxisForChart();
+    this.setState({
+      xAxisData: xAxisInfo
     })
   }
 
@@ -125,23 +137,31 @@ class ScaleScreen extends React.PureComponent {
         }
       }
       let past7Days = this.getLast7Days()
-      item = JSON.parse(await AsyncStorage.getItem('user'))
-      let cData = []
-      for (var i = 0; i < item.length; i++) {
-        for (var j = 0; j < past7Days.length; j++) {
-          if (past7Days[j] === item[i].date) {
-            cData.push(Number(item[i].weight))
-          } else {
-            cData.push(null)
-          }
-        }
-      }
       this.setState({
-        chartData: cData,
-        loading: false
+        loading: true
       })
+      item = JSON.parse(await AsyncStorage.getItem('user'))
+      let dates = item.map(element => {
+        return element.date
+      })
+      let cData = []
+      for (var j = 0; j < past7Days.length; j++) {
+        if (dates.includes(past7Days[j])) {
+          let dateArray = item.filter(element => {
+            return element.date === past7Days[j]
+          })
+          let dateObj = dateArray[0];
+          let weight = dateObj.weight;
+          cData.push(Number(weight))
+        } else {
+          cData.push(null)
+        }
+        this.setState({
+          chartData: cData,
+          loading: false
+        })
+      }
     }
-    console.log(this.state.chartData);
   }
 
   saveText = (newText) => {
@@ -198,82 +218,90 @@ class ScaleScreen extends React.PureComponent {
   }
 
   render() {
-    const data = this.state.chartData
-    const contentInset = { top: 10, bottom: 10, right: 10, left: 10 }
-    const xAxisHeight = 10
-    const { shift } = this.state;
-    const Decorator = ({ x, y, data }) => {
-      for (var index = 0; index < data.length; index++) {
-        let value = data[index];
-        if (value !== null) {
-          return (
-            <Circle
-              key={index}
-              cx={x(index)}
-              cy={y(value)}
-              r={4}
-              stroke={'rgb(134, 65, 244)'}
-              fill={'black'}
-            />
-          )
-        }
-      }
-    }
-    return (
-      <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
-        <View style={styles.titleAndChart}>
-          <Text style={styles.scaleScreenTitle}>Your Scale</Text>
-        </View>
-        <View style={{ height: Dimensions.get('window').height / 2.7, padding: 20, flexDirection: 'row' }}>
-          <YAxis
-            data={data}
-            style={{ marginBottom: xAxisHeight }}
-            contentInset={contentInset}
-            svg={{ fontSize: 10, fill: 'grey' }}
-            formatLabel={(value) => `${value}lbs`}
+    if (this.state.loading) {
+      return (
+        <ActivityIndicator
+          animating={this.state.loading}
+          color='#000000'
+          size="large"
+          style={styles.activityIndicator} />
+      )
+    } else {
+      const data = this.state.chartData
+      const contentInset = { top: 10, bottom: 10, right: 10, left: 10 }
+      const xAxisHeight = 10
+      const { shift } = this.state;
+      const Decorator = ({ x, y, data }) => {
+        return data.map((value, index) => (
+          <Circle
+            key={index}
+            cx={x(index)}
+            cy={y(value)}
+            r={4}
+            stroke={'rgb(134, 65, 244)'}
+            fill={'black'}
           />
-          <View style={{ flex: 1 }}>
-            <LineChart
-              style={{ flex: 1 }}
+        ))
+      }
+      let newArray = data.filter(element => { return element !== null })
+      let average = (newArray.reduce((p, c) => p + c, 0) / newArray.length).toFixed(1);
+      return (
+        <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
+          <View style={styles.titleAndChart}>
+            <Text style={styles.scaleScreenTitle}>Your Scale</Text>
+          </View>
+          <Text>Average: {average}lbs</Text>
+          <View style={{ height: Dimensions.get('window').height / 2.7, padding: 20, flexDirection: 'row' }}>
+            <YAxis
               data={data}
+              style={{ marginBottom: xAxisHeight }}
               contentInset={contentInset}
-              svg={{ stroke: 'rgb(0, 0, 0)' }}
-            >
-              <Grid />
-              <Decorator />
-            </LineChart>
-            <XAxis
-              style={{ marginHorizontal: -10, height: xAxisHeight }}
-              data={data}
-              formatLabel={(value, index) => this.state.yAxisData[index]}
-              contentInset={{ left: 20, right: 20 }}
-              svg={{ fontSize: 10, fill: 'black' }}
+              svg={{ fontSize: 10, fill: 'grey' }}
+              formatLabel={(value) => `${value}lbs`}
+            />
+            <View style={{ flex: 1 }}>
+              <LineChart
+                style={{ flex: 1 }}
+                data={data}
+                contentInset={contentInset}
+                svg={{ stroke: 'rgb(0, 0, 0)' }}
+              >
+                <Grid />
+                <Decorator />
+              </LineChart>
+              <XAxis
+                style={{ marginHorizontal: -10, height: xAxisHeight }}
+                data={data}
+                formatLabel={(value, index) => this.state.xAxisData[index]}
+                contentInset={{ left: 20, right: 20 }}
+                svg={{ fontSize: 10, fill: 'black' }}
+              />
+            </View>
+          </View>
+          <View style={styles.enterTodayWeightBox}>
+            <Text style={styles.enterWeightText}>Enter Today's Weight</Text>
+            <TextInput
+              style={styles.textInputBox}
+              keyboardType='number-pad'
+              returnKeyType='done'
+              placeholder='Enter Weight (In Pounds)'
+              onFocus={() => this.removeText(this.state.text)}
+              onChangeText={text => this.saveText(text)}
+              value={this.state.text}
+            />
+            <Button
+              buttonStyle={{ backgroundColor: '#ffd700', borderRadius: 20 }}
+              title="Submit"
+              titleStyle={{ color: 'black', width: '50%' }}
+              onPress={async () => {
+                await this.addToScaleData(this.state.text);
+                this.removeText(this.state.text);
+              }}
             />
           </View>
-        </View>
-        <View style={styles.enterTodayWeightBox}>
-          <Text style={styles.enterWeightText}>Enter Today's Weight</Text>
-          <TextInput
-            style={styles.textInputBox}
-            keyboardType='number-pad'
-            returnKeyType='done'
-            placeholder='Enter Weight (In Pounds)'
-            onFocus={() => this.removeText(this.state.text)}
-            onChangeText={text => this.saveText(text)}
-            value={this.state.text}
-          />
-          <Button
-            buttonStyle={{ backgroundColor: '#ffd700', borderRadius: 20 }}
-            title="Submit"
-            titleStyle={{ color: 'black', width: '50%' }}
-            onPress={async () => {
-              await this.addToScaleData(this.state.text);
-              this.removeText(this.state.text);
-            }}
-          />
-        </View>
-      </Animated.View>
-    )
+        </Animated.View>
+      )
+    }
   }
 }
 
