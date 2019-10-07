@@ -29,10 +29,10 @@ class ScaleScreen extends React.PureComponent {
       loading: true
     })
     let item = JSON.parse(await AsyncStorage.getItem('user'))
-    let dates = item.map(element => {
-      return element.date
-    })
     if (item !== null) {
+      let dates = item.map(element => {
+        return element.date
+      })
       let cData = []
       for (var j = 0; j < past7Days.length; j++) {
         if (dates.includes(past7Days[j])) {
@@ -232,25 +232,32 @@ class ScaleScreen extends React.PureComponent {
       const xAxisHeight = 10
       const { shift } = this.state;
       const Decorator = ({ x, y, data }) => {
-        return data.map((value, index) => (
-          <Circle
-            key={index}
-            cx={x(index)}
-            cy={y(value)}
-            r={4}
-            stroke={'rgb(134, 65, 244)'}
-            fill={'black'}
-          />
-        ))
+        data = data.map((value, index) => {
+          if (value !== null) {
+            return (<Circle
+              key={index}
+              cx={x(index)}
+              cy={y(value)}
+              r={4}
+              stroke={'rgb(134, 65, 244)'}
+              fill={'black'}
+            />)
+          }
+        })
+        return data;
       }
       let newArray = data.filter(element => { return element !== null })
       let average = (newArray.reduce((p, c) => p + c, 0) / newArray.length).toFixed(1);
+      average += ' lbs'
+      if(this.state.chartData.length < 1){
+        average = 'No data entered.'
+      }
       return (
         <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]}>
           <View style={styles.titleAndChart}>
             <Text style={styles.scaleScreenTitle}>Your Scale</Text>
           </View>
-          <Text>Average: {average}lbs</Text>
+          <Text style={{fontSize: 17}}>Average Weight: {average}</Text>
           <View style={{ height: Dimensions.get('window').height / 2.7, padding: 20, flexDirection: 'row' }}>
             <YAxis
               data={data}
