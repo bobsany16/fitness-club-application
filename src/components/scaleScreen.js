@@ -98,6 +98,10 @@ class ScaleScreen extends React.PureComponent {
       Alert.alert('Weight Not Possible', 'Please enter valid weight',
         { text: 'OK', onPress: () => { } }, { cancelable: true });
     } else {
+      let currentDate = this.getCurrentDate();
+      this.setState({
+        todayDate: currentDate
+      })
       let item = JSON.parse(await AsyncStorage.getItem('user'))
       if (item === null) {
         let newArray = [];
@@ -249,7 +253,7 @@ class ScaleScreen extends React.PureComponent {
       let newArray = data.filter(element => { return element !== null })
       let average = (newArray.reduce((p, c) => p + c, 0) / newArray.length).toFixed(1);
       average += ' lbs'
-      if(this.state.chartData.length < 1){
+      if (this.state.chartData.length < 1) {
         average = 'No data entered.'
       }
       return (
@@ -257,7 +261,7 @@ class ScaleScreen extends React.PureComponent {
           <View style={styles.titleAndChart}>
             <Text style={styles.scaleScreenTitle}>Your Scale</Text>
           </View>
-          <Text style={{fontSize: 17}}>Average Weight: {average}</Text>
+          <Text style={{ fontSize: 17 }}>Average Weight: {average}</Text>
           <View style={{ height: Dimensions.get('window').height / 2.7, padding: 20, flexDirection: 'row' }}>
             <YAxis
               data={data}
