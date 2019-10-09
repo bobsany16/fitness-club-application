@@ -21,6 +21,7 @@ class WorkoutScreen extends React.Component {
       searchWorkoutNames: [],
       exerciseData: [],
       exerciseNames: [],
+      setNames: [],
       search: "",
       currentWorkout: "",
       currentExercise: "",
@@ -33,6 +34,7 @@ class WorkoutScreen extends React.Component {
   }
 
   async componentDidMount() {
+    const setNames = await this.getSetNames();
     this.setState({
       loading: true
     })
@@ -48,23 +50,32 @@ class WorkoutScreen extends React.Component {
   }
 
   getWorkoutNames = async () => {
-    const res = await fetch('https://1ff12411.ngrok.io/workoutNames');
+    const res = await fetch('https://176f8305.ngrok.io/workoutNames');
     const workoutNames = await res.json();
     return workoutNames
   }
 
   getExerciseData = async () => {
-    const res = await fetch('https://1ff12411.ngrok.io/exerciseData');
+    const res = await fetch('https://176f8305.ngrok.io/exerciseData');
     const exerciseData = await res.json();
     return exerciseData;
   }
 
   getExerciseNamesByWorkout = async (index) => {
     let workoutId = index + 1;
-    const res = await fetch(`https://1ff12411.ngrok.io/workout/${workoutId}/exercises`);
+    const res = await fetch(`https://176f8305.ngrok.io/workout/${workoutId}/exercises`);
     let exerciseNames = await res.json();
     return exerciseNames;
   };
+
+  getSetNames = async (index) => {
+    let workoutId = index + 1;
+    const res = await fetch(`https://176f8305.ngrok.io/workout/${workoutId}/setData`);
+    let setNames = await res.json();
+    return setNames;
+  }
+
+
 
   setModalVisible(visibility) {
     this.setState({ modalVisible: visibility });
@@ -136,7 +147,7 @@ class WorkoutScreen extends React.Component {
                 letterSpacing: 2
               }}
             >
-              Day {index+1}
+              Day {index + 1}
             </Text>
             <Text
               key={workoutName}
@@ -203,7 +214,7 @@ class WorkoutScreen extends React.Component {
       loading: true
     });
     let exId = index + 1;
-    const res = await fetch(`https://1ff12411.ngrok.io/exercise/${exId}/youtubeLink`);
+    const res = await fetch(`https://176f8305.ngrok.io/exercise/${exId}/youtubeLink`);
     let exObj = await res.json();
     let youtubeLink = exObj.youtubeUrl;
     this.setState({
@@ -332,26 +343,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     height: "85%"
   },
-
-  // workoutModels: {
-  //   flexDirection: "column",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  //   height: 200,
-  //   borderRadius: 45,
-  //   backgroundColor: "#b2bec3",
-  //   marginHorizontal: 20,
-  //   marginVertical: 10
-  // },
-
-  // exerciseModels: {
-  //   flexDirection: "column",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  //   height: 100,
-  //   backgroundColor: "#b2bec3",
-  //   marginVertical: 10
-  // },
 
   backToWorkoutScrn: {
     paddingLeft: 20,
