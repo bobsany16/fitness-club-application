@@ -2,17 +2,17 @@ import React from "react";
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { Icon } from "react-native-elements";
-import JournalScreen from './journalScreen';
+import ExerciseScreen from './exerciseScreen';
 import WorkoutScreen from './workoutScreen';
 import ScaleScreen from './scaleScreen';
 
 const Nav = createAppContainer(
   createBottomTabNavigator(
     {
-      Journal: {
-        screen: JournalScreen,
+      Exercises: {
+        screen: ExerciseScreen,
         navigationOptions: {
-          tabBarIcon: () => <Icon name="book" type="antdesign" />
+          tabBarIcon: () => <Icon name="search1" type="antdesign" />
         }
       },
 
