@@ -40,7 +40,6 @@ export default class App extends Component {
       content: bodyPartsData,
       loading: false
     })
-    //console.log(this.state.content);
   }
 
   setModalVisible(visibility) {
@@ -83,7 +82,9 @@ export default class App extends Component {
               justifyContent: "center",
               height: Dimensions.get('window').height / 9,
               backgroundColor: myColors[index % myColors.length],
-              margin: 5
+              borderRadius: 10,
+              marginHorizontal: 8,
+              marginVertical: 20
             }}
           >
             <Text
@@ -92,7 +93,8 @@ export default class App extends Component {
                 color: myTextColors[index % myTextColors.length],
                 fontSize: 25,
                 textTransform: "uppercase",
-                letterSpacing: 2
+                letterSpacing: 2,
+                padding: 10
               }}
             >
               {exName}
@@ -100,7 +102,7 @@ export default class App extends Component {
           </View>
         </TouchableOpacity>)
       })
-      return (<View key={index} style={{ backgroundColor: '#F0FFFF', width: Dimensions.get('window').width, paddingBottom: 10 }}>
+      return (<View key={index} style={{ backgroundColor: '#dfe6e9', width: Dimensions.get('window').width, marginBottom:20 }}>
         <View style={{ display: 'flex', flexDirection: 'row', paddingLeft: 5 }}>
           <Text
             key={element.title}
@@ -135,8 +137,8 @@ export default class App extends Component {
       return (
         <View style={styles.container}>
           <ScrollView contentContainerStyle={{ paddingTop: 30 }}>
-            <View style={{ display: 'flex', alignItems: 'center', paddingBottom: 10 }}>
-              <Text style={{ fontSize: 30 }}>Exercise Screen</Text>
+            <View style={{ display: 'flex', alignItems: 'center', paddingBottom: 20 }}>
+              <Text style={{ fontSize: 40, fontWeight:'600' }}>Exercise Screen</Text>
             </View>
             <View>
               {bodyPartsAndExercises}
@@ -147,7 +149,7 @@ export default class App extends Component {
               visible={this.state.modalVisible}
             >
               <View style={{ height: Dimensions.get("window").height }}>
-                <View style={styles.backToWorkoutScrn}>
+                <View style={styles.backToExerciseScreen}>
                   <Icon
                     name="chevron-left"
                     size={25}
@@ -157,7 +159,7 @@ export default class App extends Component {
                     }}
                   />
                   <View style={{ paddingRight: 20 }}>
-                    <Text style={styles.currentWorkoutTitle}>
+                    <Text style={styles.currentExerciseTitle}>
                       {this.state.currentExercise}
                     </Text>
                   </View>
@@ -180,64 +182,11 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
     alignContent: 'center',
     alignItems: 'center',
     flexDirection: "column"
   },
-  title: {
-    textAlign: 'center',
-    fontSize: 22,
-    fontWeight: '300',
-    marginBottom: 20,
-  },
-  header: {
-    backgroundColor: '#F5FCFF',
-    padding: 10,
-  },
-  headerText: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  content: {
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  active: {
-    backgroundColor: 'rgba(255,255,255,1)',
-  },
-  inactive: {
-    backgroundColor: 'rgba(245,252,255,1)',
-  },
-  selectors: {
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  selector: {
-    backgroundColor: '#F5FCFF',
-    padding: 10,
-  },
-  activeSelector: {
-    fontWeight: 'bold',
-  },
-  selectTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    padding: 10,
-  },
-  multipleToggle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 30,
-    alignItems: 'center',
-  },
-  multipleToggle__title: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  backToWorkoutScrn: {
+  backToExerciseScreen: {
     paddingLeft: 20,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -245,7 +194,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     marginBottom: 10
   },
-  currentWorkoutTitle: {
+  currentExerciseTitle: {
     fontSize: 20
   },
   activityIndicator: {
