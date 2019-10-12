@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  Button,
   View,
   TouchableOpacity,
   ActivityIndicator
@@ -69,7 +68,7 @@ export default class App extends Component {
     let myColors = ["#000000", "#FFC107"];
     let myTextColors = ["#FFFFFF", "#000000"];
     let data = this.state.content;
-    let components = data.map((element,index) => {
+    let components = data.map((element, index) => {
       let buttons = element.exercises.map((exName, index) => {
         return (<TouchableOpacity
           key={exName}
@@ -142,46 +141,6 @@ export default class App extends Component {
             <View>
               {bodyPartsAndExercises}
             </View>
-            {/* <View style={{ backgroundColor: '#F0FFFF', width: Dimensions.get('window').width }}>
-              <View style={{ display: 'flex', flexDirection: 'row', paddingLeft:5 }}>
-                <Text style={{ fontSize: 25, paddingRight:6 }}>Legs</Text>
-                <Icon
-                  name="chevron-right"
-                  size={25}
-                  color="black"
-                  style={{paddingTop:5}}
-                />
-              </View>
-              <ScrollView horizontal={true}>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.onPressExercise('Legs');
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: Dimensions.get('window').height / 9,
-                      backgroundColor: myColors[0],
-                      margin: 5
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: myTextColors[0],
-                        fontSize: 25,
-                        textTransform: "uppercase",
-                        letterSpacing: 2
-                      }}
-                    >
-                      Legs
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </ScrollView>
-            </View> */}
             <Modal
               animationType="slide"
               transparent={false}
