@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   Modal,
   Dimensions,
@@ -9,7 +9,7 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator
-} from 'react-native';
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default class App extends Component {
@@ -18,9 +18,9 @@ export default class App extends Component {
     this.state = {
       content: [],
       activeSections: [],
-      currentExercise: '',
+      currentExercise: "",
       modalVisible: false,
-      youtubeUrl: '',
+      youtubeUrl: "",
       loading: false
     };
   }
@@ -28,40 +28,46 @@ export default class App extends Component {
   async componentDidMount() {
     this.setState({
       loading: true
-    })
+    });
     let bodyPartsAndExercises = await this.getBodyPartsAndExercises();
     let bodyPartsData = bodyPartsAndExercises.map(element => {
-      return ({
+      return {
         title: element.bodyPartName,
         exercises: element.exercises
-      })
-    })
+      };
+    });
     this.setState({
       content: bodyPartsData,
       loading: false
-    })
+    });
   }
 
   setModalVisible(visibility) {
     this.setState({ modalVisible: visibility });
-  };
-
-  getBodyPartsAndExercises = async () => {
-    const res = await fetch('http://a5ce3b6e.ngrok.io/bodyPartsAndExercises');
-    const bodyPartsExercises = await res.json();
-    return bodyPartsExercises
   }
 
-  onPressExercise = async (exName) => {
-    const res = await fetch(`http://a5ce3b6e.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`);
+  getBodyPartsAndExercises = async () => {
+    const res = await fetch("http://686999c1.ngrok.io/bodyPartsAndExercises");
+    const bodyPartsExercises = await res.json();
+    return bodyPartsExercises;
+  };
+
+  onPressExercise = async exName => {
+    this.setState({
+      loading: true
+    });
+    const res = await fetch(
+      `http://686999c1.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
+    );
     let youtubeLink = await res.json();
     youtubeLink = youtubeLink.youtubeUrl;
     this.setState({
       youtubeUrl: youtubeLink,
-      currentExercise: exName
-    })
+      currentExercise: exName,
+      loading: false
+    });
     this.setModalVisible(true);
-  }
+  };
 
   createBodyPartsExercisesComponents = () => {
     let myColors = ["#000000", "#FFC107"];
@@ -69,110 +75,133 @@ export default class App extends Component {
     let data = this.state.content;
     let components = data.map((element, index) => {
       let buttons = element.exercises.map((exName, index) => {
-        return (<TouchableOpacity
-          key={exName}
-          onPress={() => {
-            this.onPressExercise(exName);
+        return (
+          <TouchableOpacity
+            key={exName}
+            onPress={() => {
+              this.onPressExercise(exName);
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: Dimensions.get("window").height / 9,
+                backgroundColor: myColors[index % myColors.length],
+                borderRadius: 10,
+                marginHorizontal: 8,
+                marginVertical: 20
+              }}
+            >
+              <Text
+                key={index}
+                style={{
+                  color: myTextColors[index % myTextColors.length],
+                  fontSize: 20,
+                  textTransform: "uppercase",
+                  letterSpacing: 2,
+                  padding: 10
+                }}
+              >
+                {exName}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        );
+      });
+      return (
+        <View
+          key={index}
+          style={{
+            backgroundColor: "#dfe6e9",
+            width: Dimensions.get("window").width,
+            marginBottom: 20
           }}
         >
           <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              height: Dimensions.get('window').height / 9,
-              backgroundColor: myColors[index % myColors.length],
-              borderRadius: 10,
-              marginHorizontal: 8,
-              marginVertical: 20
-            }}
+            style={{ display: "flex", flexDirection: "row", paddingLeft: 5 }}
           >
             <Text
-              key={index}
-              style={{
-                color: myTextColors[index % myTextColors.length],
-                fontSize: 25,
-                textTransform: "uppercase",
-                letterSpacing: 2,
-                padding: 10
-              }}
+              key={element.title}
+              style={{ paddingRight: 6, fontSize: 25, fontWeight: "200" }}
             >
-              {exName}
+              {element.title}
             </Text>
+            <Icon
+              key={index}
+              name="chevron-right"
+              size={25}
+              color="#2f3640"
+              style={{ paddingTop: 5 }}
+            />
           </View>
-        </TouchableOpacity>)
-      })
-      return (<View key={index} style={{ backgroundColor: '#dfe6e9', width: Dimensions.get('window').width, marginBottom:20 }}>
-        <View style={{ display: 'flex', flexDirection: 'row', paddingLeft: 5 }}>
-          <Text
-            key={element.title}
-            style={{ fontSize: 25, paddingRight: 6 }}>{element.title}</Text>
-          <Icon
-            key={index}
-            name="chevron-right"
-            size={25}
-            color="black"
-            style={{ paddingTop: 5 }}
-          />
+          <ScrollView horizontal={true}>{buttons}</ScrollView>
         </View>
-        <ScrollView horizontal={true}>
-          {buttons}
-        </ScrollView>
-      </View>)
-    })
+      );
+    });
     return components;
-  }
+  };
 
   render() {
     if (this.state.loading) {
       return (
         <ActivityIndicator
           animating={this.state.loading}
-          color='#000000'
+          color="#000000"
           size="large"
-          style={styles.activityIndicator} />
-      )
+          style={styles.activityIndicator}
+        />
+      );
     } else {
       let bodyPartsAndExercises = this.createBodyPartsExercisesComponents();
       return (
         <View style={styles.container}>
-          <ScrollView contentContainerStyle={{ paddingTop: 30 }}>
-            <View style={{ display: 'flex', alignItems: 'center', paddingBottom: 20 }}>
-              <Text style={{ fontSize: 40, fontWeight:'600' }}>Exercise Screen</Text>
-            </View>
-            <View>
-              {bodyPartsAndExercises}
-            </View>
-            <Modal
-              animationType="slide"
-              transparent={false}
-              visible={this.state.modalVisible}
-            >
-              <View style={{ height: Dimensions.get("window").height }}>
-                <View style={styles.backToExerciseScreen}>
-                  <Icon
-                    name="chevron-left"
-                    size={25}
-                    color="black"
-                    onPress={() => {
-                      this.setModalVisible(false);
-                    }}
-                  />
-                  <View style={{ paddingRight: 20 }}>
-                    <Text style={styles.currentExerciseTitle}>
-                      {this.state.currentExercise}
-                    </Text>
-                  </View>
-                </View>
-                <WebView
-                  javaScriptEnabled={true}
-                  domStorageEnabled={true}
-                  source={{ uri: this.state.youtubeURL }}
-                  mediaPlaybackRequiresUserAction={false}
-                />
+          <View style={{paddingTop:'10%'}}>
+            <ScrollView>
+              <View
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  paddingBottom: "5%"
+                }}
+              >
+                <Text style={{ fontSize: 50, fontWeight: "700" }}>
+                  All Exercises
+                </Text>
               </View>
-            </Modal>
-          </ScrollView>
+              <View>{bodyPartsAndExercises}</View>
+              <Modal
+                animationType="slide"
+                transparent={false}
+                visible={this.state.modalVisible}
+              >
+                <View style={{ height: Dimensions.get("window").height }}>
+                  <View style={styles.backToExerciseScreen}>
+                    <Icon
+                      name="chevron-left"
+                      size={25}
+                      color="black"
+                      onPress={() => {
+                        this.setModalVisible(false);
+                      }}
+                    />
+                    <View style={{ paddingRight: 20 }}>
+                      <Text style={styles.currentExerciseTitle}>
+                        {this.state.currentExercise}
+                      </Text>
+                    </View>
+                  </View>
+                  <WebView
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    source={{ uri: this.state.youtubeUrl }}
+                    mediaPlaybackRequiresUserAction={false}
+                  />
+                </View>
+              </Modal>
+            </ScrollView>
+          </View>
         </View>
       );
     }
@@ -182,8 +211,8 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignContent: 'center',
-    alignItems: 'center',
+    alignContent: "center",
+    alignItems: "center",
     flexDirection: "column"
   },
   backToExerciseScreen: {
@@ -199,8 +228,8 @@ const styles = StyleSheet.create({
   },
   activityIndicator: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     height: 80
   }
 });
