@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
+import cuid from 'cuid'
 
 class WorkoutScreen extends React.Component {
   constructor(props) {
@@ -19,7 +21,6 @@ class WorkoutScreen extends React.Component {
     this.state = {
       workoutNames: [],
       searchWorkoutNames: [],
-      exerciseData: [],
       exerciseNames: [],
       setNames: [],
       search: "",
@@ -29,69 +30,39 @@ class WorkoutScreen extends React.Component {
       showWorkoutScreen: true,
       showExerciseScreen: false,
       modalVisible: false,
-      loading: false
+      loading: false,
+      setData: {}
     };
   }
 
   async componentDidMount() {
-    const setNames = await this.getSetNames();
     this.setState({
       loading: true
     })
     const wNames = await this.getWorkoutNames();
-    const exData = await this.getExerciseData();
     this.setState({
       showWorkoutScreen: true,
       workoutNames: wNames,
-      exerciseData: exData,
       searchWorkoutNames: wNames,
       loading: false
     });
   }
 
   getWorkoutNames = async () => {
-    const res = await fetch('https://176f8305.ngrok.io/workoutNames');
+    const res = await fetch('http://659fc8a7.ngrok.io/workoutNames');
     const workoutNames = await res.json();
     return workoutNames
   }
 
-  getExerciseData = async () => {
-    const res = await fetch('https://176f8305.ngrok.io/exerciseData');
-    const exerciseData = await res.json();
-    return exerciseData;
-  }
-
-  getExerciseNamesByWorkout = async (index) => {
+  getSetDataPerWorkout = async (index) => {
     let workoutId = index + 1;
-    const res = await fetch(`https://176f8305.ngrok.io/workout/${workoutId}/exercises`);
-    let exerciseNames = await res.json();
-    return exerciseNames;
-  };
-
-  getSetNames = async (index) => {
-    let workoutId = index + 1;
-    const res = await fetch(`https://176f8305.ngrok.io/workout/${workoutId}/setData`);
+    const res = await fetch(`http://659fc8a7.ngrok.io/workout/${workoutId}/setData`);
     let setNames = await res.json();
     return setNames;
   }
 
-
-
   setModalVisible(visibility) {
     this.setState({ modalVisible: visibility });
-  };
-
-  showExerciseScreen = async (workoutId) => {
-    this.setState({
-      loading: true
-    })
-    const exerNames = await this.getExerciseNamesByWorkout(workoutId);
-    this.setState({
-      exerciseNames: exerNames,
-      showExerciseScreen: true,
-      showWorkoutScreen: false,
-      loading: false
-    });
   };
 
   toggleWorkoutSearchView = text => {
@@ -114,92 +85,68 @@ class WorkoutScreen extends React.Component {
     });
   };
 
-  createButtons = names => {
+  createWorkoutButtons = names => {
     let buttons = [];
     let myColors = ["#000000", "#FFC107"];
     let myTextColors = ["#FFFFFF", "#000000"];
-    if (this.state.showWorkoutScreen === true) {
-      buttons = names.map((workoutName, index) => (
-        <TouchableOpacity
-          key={workoutName}
-          onPress={() => {
-            this.onPressWorkouts(workoutName, index);
+    buttons = names.map((workoutName, index) => (
+      <TouchableOpacity
+        key={workoutName}
+        onPress={() => {
+          this.onPressWorkouts(workoutName, index);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: myColors[index % myColors.length],
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 200,
+            borderRadius: 45,
+            marginHorizontal: 20,
+            marginVertical: 10
           }}
         >
-          <View
+          <Text
+            key={index}
             style={{
-              backgroundColor: myColors[index % myColors.length],
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 200,
-              borderRadius: 45,
-              marginHorizontal: 20,
-              marginVertical: 10
+              color: myTextColors[index % myTextColors.length],
+              fontSize: 15,
+              textTransform: "uppercase",
+              letterSpacing: 2
             }}
           >
-            <Text
-              key={index}
-              style={{
-                color: myTextColors[index % myTextColors.length],
-                fontSize: 15,
-                textTransform: "uppercase",
-                letterSpacing: 2
-              }}
-            >
-              Day {index + 1}
-            </Text>
-            <Text
-              key={workoutName}
-              style={{
-                color: myTextColors[index % myTextColors.length],
-                fontSize: 35,
-                textTransform: "uppercase",
-                letterSpacing: 2
-              }}
-            >
-              {workoutName}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ));
-    } else if (this.state.showExerciseScreen === true) {
-      buttons = names.map((exName, index) => (
-        <TouchableOpacity
-          key={exName}
-          onPress={() => {
-            this.onPressExercises(index);
-            this.setState({
-              currentExercise: exName
-            })
-          }}
-        >
-          <View
+            Day {index + 1}
+          </Text>
+          <Text
+            key={workoutName}
             style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 100,
-              backgroundColor: myColors[index % myColors.length],
-              marginVertical: 10
+              color: myTextColors[index % myTextColors.length],
+              fontSize: 35,
+              textTransform: "uppercase",
+              letterSpacing: 2
             }}
           >
-            <Text
-              key={exName}
-              style={{
-                color: myTextColors[index % myTextColors.length],
-                fontSize: 25,
-                textTransform: "uppercase",
-                letterSpacing: 2
-              }}
-            >
-              {exName}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ));
-    }
+            {workoutName}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    ));
     return buttons;
+  };
+
+  showExerciseScreen = async (workoutId) => {
+    this.setState({
+      loading: true
+    })
+    const setInfo = await this.getSetDataPerWorkout(workoutId);
+    this.setState({
+      setData: setInfo,
+      showExerciseScreen: true,
+      showWorkoutScreen: false,
+      loading: false
+    });
   };
 
   onPressWorkouts = (workoutName, workoutId) => {
@@ -209,33 +156,129 @@ class WorkoutScreen extends React.Component {
     this.showExerciseScreen(workoutId);
   };
 
-  onPressExercises = async (index) => {
+  onPressExercise = async exName => {
     this.setState({
       loading: true
     });
-    let exId = index + 1;
-    const res = await fetch(`https://176f8305.ngrok.io/exercise/${exId}/youtubeLink`);
-    let exObj = await res.json();
-    let youtubeLink = exObj.youtubeUrl;
+    const res = await fetch(
+      `http://659fc8a7.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
+    );
+    let youtubeLink = await res.json();
+    youtubeLink = youtubeLink.youtubeUrl;
     this.setState({
-      youtubeURL: youtubeLink,
+      youtubeUrl: youtubeLink,
+      currentExercise: exName,
       loading: false
-    })
+    });
     this.setModalVisible(true);
   };
+
+  createSetScreen = () => {
+    let setNames = Object.keys(this.state.setData)
+    let myColors = ["#FFC107", "white"];
+    let myTextColors = ["#000000", "black"];
+    let setScreen = setNames.map((setName, index) => {
+      let exData = this.state.setData[setName];
+      let exercises = exData.map((element, index) => {
+        let exName = element.exerciseName;
+        let reps = element.rep;
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              this.onPressExercise(exName);
+            }}
+            key={cuid()}
+            style={{
+              display: 'flex',
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: Dimensions.get('window').height / 8,
+              backgroundColor: myColors[index % myColors.length],
+              width: '80%',
+              marginVertical: '3%',
+              borderRadius:'10%'
+            }}
+          >
+            <Text
+              key={cuid()}
+              style={{
+                color: myTextColors[index % myTextColors.length],
+                fontSize: 20,
+                textTransform: "uppercase",
+                letterSpacing: 2
+              }}
+            >{exName}</Text>
+            <Text
+              key={cuid()}
+              style={{
+                color: myTextColors[index % myTextColors.length],
+                fontSize: 20,
+                textTransform: "uppercase",
+                letterSpacing: 2
+              }}
+            >{reps}</Text>
+          </TouchableOpacity>
+        )
+      })
+      return (
+        <View style={{ marginBottom: '3%' }}
+          key={cuid()} >
+          <Collapse
+            key={cuid()}
+          >
+            <CollapseHeader
+              key={cuid()}
+            >
+              <View style={{
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: Dimensions.get('window').height / 8,
+                borderRadius: '10%',
+                backgroundColor: '#000000',
+                marginHorizontal: '5%'
+              }}
+              >
+                <Text
+                  key={cuid()}
+                  style={{ color: '#FFFFFF', fontSize: 30 }}
+                >
+                  {setName}
+                </Text>
+              </View>
+            </CollapseHeader>
+            <CollapseBody
+              key={cuid()}
+              style={{
+                backgroundColor: '#555555',
+                marginHorizontal: '5%',
+                borderRadius: '10%',
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+              {exercises}
+            </CollapseBody>
+          </Collapse>
+        </View >)
+    })
+    return setScreen
+  }
 
   render() {
     if (this.state.loading) {
       return (
         <ActivityIndicator
           animating={this.state.loading}
-          color='#000000'
+          color="#000000"
           size="large"
-          style={styles.activityIndicator} />
+          style={styles.activityIndicator}
+        />
       )
     } else {
       if (this.state.showWorkoutScreen === true) {
-        let workoutButtons = this.createButtons(this.state.searchWorkoutNames);
+        let workoutButtons = this.createWorkoutButtons(this.state.searchWorkoutNames);
         return (
           <View style={styles.container}>
             <View style={styles.searchSection}>
@@ -260,7 +303,7 @@ class WorkoutScreen extends React.Component {
       }
 
       if (this.state.showExerciseScreen === true) {
-        let exerciseButtons = this.createButtons(this.state.exerciseNames);
+        let setScreen = this.createSetScreen();
         return (
           <View style={styles.container}>
             <Modal
@@ -287,7 +330,7 @@ class WorkoutScreen extends React.Component {
                 <WebView
                   javaScriptEnabled={true}
                   domStorageEnabled={true}
-                  source={{ uri: this.state.youtubeURL }}
+                  source={{ uri: this.state.youtubeUrl }}
                   mediaPlaybackRequiresUserAction={false}
                 />
               </View>
@@ -311,7 +354,7 @@ class WorkoutScreen extends React.Component {
               </View>
             </View>
             <ScrollView style={styles.workoutSection}>
-              {exerciseButtons}
+              {setScreen}
             </ScrollView>
           </View>
         );
