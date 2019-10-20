@@ -5,7 +5,6 @@ import { Button } from "react-native-elements";
 class WaiverScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
   }
   render() {
     return (
@@ -14,13 +13,12 @@ class WaiverScreen extends React.Component {
           <Text style={styles.mainTitle}> THOMAS'S </Text>
           <Text style={styles.mainTitle2}> FITNESS APP </Text>
         </View>
-
         <View style={styles.waiver}>
           <Text style={styles.waiverTitle}> Waiver Liability </Text>
           <ScrollView>
             <Text style={styles.waiverScroller}>
               ST. BONAVENTURE UNIVERSITY WAIVER OF LIABILITY AND HOLD HARMLESS
-              AGREEMENT{"\n"} {"\n"} 
+              AGREEMENT{"\n"} {"\n"}
 
               1. In consideration for the opportunity to participate
               in the workouts on this mobile application and other valuable
@@ -61,7 +59,7 @@ class WaiverScreen extends React.Component {
               of loss, property damage or personal injury, including death, that
               may be sustained by me, or any loss or damage to property owned by
               me, as a result of being engaged in such an activity, whether
-              caused by the negligence of RELEASEES or otherwise. 
+              caused by the negligence of RELEASEES or otherwise.
 
               {"\n"}4. I further
               hereby agree to indemnify and hold harmless the RELEASEES from any
@@ -74,11 +72,11 @@ class WaiverScreen extends React.Component {
               attorney if I am alive, and my heirs, assigns and personal
               representative if I am not alive. I hereby further agree that this
               Waiver of Liability and Hold Harmless Agreement shall be construed
-              in accordance with the laws of the State of New York. 
+              in accordance with the laws of the State of New York.
 
               {"\n"}6. I
               understand and agree that the University shall not be responsible
-              for any medical costs associated with any injury I may sustain. 
+              for any medical costs associated with any injury I may sustain.
 
               {"\n"}7.
               I further agree to become familiar with the rules and regulations
@@ -86,7 +84,7 @@ class WaiverScreen extends React.Component {
               said rules of any directive or instruction made by the person or
               persons in charge of said activity and that I will further assume
               the complete risk of any activity done in violation of any rule or
-              directive or instruction. 
+              directive or instruction.
 
               {"\n"}8. I also understand that I should, and
               am urged by the University to, obtain adequate health and accident
@@ -118,9 +116,6 @@ class WaiverScreen extends React.Component {
           <Button
             buttonStyle={styles.acceptButton}
             style={styles.fontButton}
-            /*linearGradientProps={{
-              colors: ["#2d3436", "#636e72"]
-            }}*/
             title="I Accept"
             type="solid"
             onPress={() => {
@@ -162,12 +157,10 @@ const styles = StyleSheet.create({
 
   mainTitle2: {
     fontSize: 40,
-    //fontFamily: "AppleSDGothicNeo-Bold",
     letterSpacing: 5
   },
   mainTitle: {
     fontSize: 45
-    //fontFamily: "AppleSDGothicNeo-Light"
   },
 
   waiver: {
@@ -181,13 +174,11 @@ const styles = StyleSheet.create({
   },
 
   waiverScroller: {
-    //fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 15,
     margin: 20
   },
 
   waiverTitle: {
-    //fontFamily: "AppleSDGothicNeo-Medium",
     fontSize: 17,
     alignItems: "flex-start",
     letterSpacing: 2,
@@ -209,7 +200,6 @@ const styles = StyleSheet.create({
   },
 
   fontButton: {
-    //fontFamily: "AppleSDGothicNeo-Bold",
     fontSize: 40
   },
 
@@ -218,7 +208,6 @@ const styles = StyleSheet.create({
     color: "#0185EA",
     flex: 1,
     textDecorationLine: "underline"
-    //fontFamily: "AppleSDGothicNeo-Light"
   },
 
   policySection: {

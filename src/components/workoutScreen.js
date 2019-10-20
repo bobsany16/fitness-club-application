@@ -21,7 +21,6 @@ class WorkoutScreen extends React.Component {
     this.state = {
       workoutNames: [],
       searchWorkoutNames: [],
-      exerciseNames: [],
       setNames: [],
       search: "",
       currentWorkout: "",
@@ -49,14 +48,14 @@ class WorkoutScreen extends React.Component {
   }
 
   getWorkoutNames = async () => {
-    const res = await fetch('http://659fc8a7.ngrok.io/workoutNames');
+    const res = await fetch('http://7530927f.ngrok.io/workoutNames');
     const workoutNames = await res.json();
     return workoutNames
   }
 
   getSetDataPerWorkout = async (index) => {
     let workoutId = index + 1;
-    const res = await fetch(`http://659fc8a7.ngrok.io/workout/${workoutId}/setData`);
+    const res = await fetch(`http://7530927f.ngrok.io/workout/${workoutId}/setData`);
     let setNames = await res.json();
     return setNames;
   }
@@ -161,7 +160,7 @@ class WorkoutScreen extends React.Component {
       loading: true
     });
     const res = await fetch(
-      `http://659fc8a7.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
+      `http://7530927f.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
     );
     let youtubeLink = await res.json();
     youtubeLink = youtubeLink.youtubeUrl;

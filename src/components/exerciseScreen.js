@@ -17,7 +17,6 @@ export default class App extends Component {
     super(props);
     this.state = {
       content: [],
-      activeSections: [],
       currentExercise: "",
       modalVisible: false,
       youtubeUrl: "",
@@ -47,7 +46,7 @@ export default class App extends Component {
   }
 
   getBodyPartsAndExercises = async () => {
-    const res = await fetch("http://686999c1.ngrok.io/bodyPartsAndExercises");
+    const res = await fetch("http://7530927f.ngrok.io/bodyPartsAndExercises");
     const bodyPartsExercises = await res.json();
     return bodyPartsExercises;
   };
@@ -57,7 +56,7 @@ export default class App extends Component {
       loading: true
     });
     const res = await fetch(
-      `http://686999c1.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
+      `http://7530927f.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
     );
     let youtubeLink = await res.json();
     youtubeLink = youtubeLink.youtubeUrl;
@@ -116,7 +115,7 @@ export default class App extends Component {
           style={{
             backgroundColor: "#dfe6e9",
             width: Dimensions.get("window").width,
-            marginBottom: 20
+            marginBottom: 10
           }}
         >
           <View
@@ -124,7 +123,7 @@ export default class App extends Component {
           >
             <Text
               key={element.title}
-              style={{ paddingRight: 6, fontSize: 25, fontWeight: "200" }}
+              style={{ paddingRight: 6, fontSize: 25, fontWeight: "500" }}
             >
               {element.title}
             </Text>
@@ -157,19 +156,19 @@ export default class App extends Component {
       let bodyPartsAndExercises = this.createBodyPartsExercisesComponents();
       return (
         <View style={styles.container}>
-          <View style={{paddingTop:'10%'}}>
-            <ScrollView>
-              <View
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  paddingBottom: "5%"
-                }}
-              >
-                <Text style={{ fontSize: 50, fontWeight: "700" }}>
-                  All Exercises
+          <View style={{ paddingTop: '10%' }}>
+            <View
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingBottom: "5%"
+              }}
+            >
+              <Text style={{ fontSize: 50, fontWeight: "700" }}>
+                All Exercises
                 </Text>
-              </View>
+            </View>
+            <ScrollView>
               <View>{bodyPartsAndExercises}</View>
               <Modal
                 animationType="slide"
