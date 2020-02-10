@@ -326,11 +326,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     alignItems: 'center',
-    paddingTop: '5%'
+    paddingTop: '6%', 
+    
   },
   scaleScreenTitle: {
     fontSize: 50,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   activityIndicator: {
     flex: 1,
@@ -340,7 +341,7 @@ const styles = StyleSheet.create({
   },
   enterWeightText: {
     fontSize: 30,
-    fontWeight: '500',
+    fontWeight: '300',
     color: 'white'
   },
   textInputBox: {

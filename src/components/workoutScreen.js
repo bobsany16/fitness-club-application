@@ -1,4 +1,12 @@
 import React from "react";
+import { SearchBar } from "react-native-elements";
+import Icon from "react-native-vector-icons/FontAwesome";
+import {
+  Collapse,
+  CollapseHeader,
+  CollapseBody
+} from "accordion-collapse-react-native";
+import cuid from "cuid";
 import {
   Dimensions,
   Modal,
@@ -10,12 +18,20 @@ import {
   View,
   ActivityIndicator
 } from "react-native";
-import { SearchBar } from "react-native-elements";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
-import cuid from 'cuid'
-
+/**
+ * Generates the main workout screen.
+ * Displays workout buttons. When pressed -> displays set buttons -> when
+ * presssed will display exercise modals -> when pressed will display YouTube video in a modal.
+ *
+ * @author Bobby Nguyen, Shikhar Dixit
+ * @since 1.0.0
+ * @extends React.Component
+ */
 class WorkoutScreen extends React.Component {
+  /**
+   * Constructor for the class.
+   * @param {} props to pass props to parent constructor React.Component
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -30,14 +46,21 @@ class WorkoutScreen extends React.Component {
       showExerciseScreen: false,
       modalVisible: false,
       loading: false,
-      setData: {}
+      setData: {},
+      myColorsALT: [],
+      myTextColorsALT: []
     };
   }
 
+  /**
+   * async function to test if data is fetched from REST API.
+   *
+   * @returns {Promise} wNames to see if data was fetched from workoutNames.
+   */
   async componentDidMount() {
     this.setState({
       loading: true
-    })
+    });
     const wNames = await this.getWorkoutNames();
     this.setState({
       showWorkoutScreen: true,
@@ -47,36 +70,62 @@ class WorkoutScreen extends React.Component {
     });
   }
 
+  /**
+   * Get the WorkoutNames from API call
+   *
+   * @returns {string Array} workoutNames string array for workoutNames fetched from API
+   */
   getWorkoutNames = async () => {
-    const res = await fetch('http://7530927f.ngrok.io/workoutNames');
+    const res = await fetch("https://845d4122.ngrok.io/workoutNames");
     const workoutNames = await res.json();
-    return workoutNames
-  }
-
-  getSetDataPerWorkout = async (index) => {
-    let workoutId = index + 1;
-    const res = await fetch(`http://7530927f.ngrok.io/workout/${workoutId}/setData`);
-    let setNames = await res.json();
-    return setNames;
-  }
-
-  setModalVisible(visibility) {
-    this.setState({ modalVisible: visibility });
+    return workoutNames;
   };
 
-  toggleWorkoutSearchView = text => {
+  /**
+   * To get the set data for each workout from API call
+   *
+   * @param {number} index index number for setData from workoutId#
+   * @returns {string Array} string array for setNames fetched from API
+   */
+  getSetDataPerWorkout = async index => {
+    let workoutId = index + 1;
+    const res = await fetch(
+      `https://845d4122.ngrok.io/workout/${workoutId}/setData`
+    );
+    let setNames = await res.json();
+    return setNames;
+  };
+
+  /**
+   * Sets visibility for youtube modal when clicking on exercise box
+   *
+   * @param {*} visibility
+   */
+  setModalVisible(visibility) {
+    this.setState({ modalVisible: visibility });
+  }
+
+  /**
+   * Transitions between search view and normal workout view
+   *
+   * @param {string} inputText when user types in search box
+   */
+  toggleWorkoutSearchView = inputText => {
     let wNames = [];
-    for (let name of this.state.workoutNames) {
-      if (name.includes(text)) {
-        wNames.push(name);
+    for (let searchName of this.state.workoutNames) {
+      if (searchName.includes(inputText)) {
+        wNames.push(searchName);
       }
     }
     this.setState({
-      search: text,
+      search: inputText,
       searchWorkoutNames: wNames
     });
   };
 
+  /**
+   * Resets the search bar to ""
+   */
   clearWorkoutSearch = () => {
     this.setState({
       search: "",
@@ -84,10 +133,19 @@ class WorkoutScreen extends React.Component {
     });
   };
 
+  /**
+   * Creates dynamic workout plan buttons when click on 'workout' tab
+   * Arrow function that takes in variable 'name'
+   *
+   * @param {string Array} names array to pass in workout names when called
+   * @returns {Array} buttons dynamically created
+   */
   createWorkoutButtons = names => {
     let buttons = [];
-    let myColors = ["#000000", "#FFC107"];
-    let myTextColors = ["#FFFFFF", "#000000"];
+    let myColors = ["#000000", "#FFC107"]; //store black and yellow colors to alternate colors of the workout buttons
+    let myTextColors = ["#FFFFFF", "#000000"]; //store black and yellow colors to alternate colors of the workout button texts
+
+    //uses map() function to mapp workoutName to buttons
     buttons = names.map((workoutName, index) => (
       <TouchableOpacity
         key={workoutName}
@@ -96,36 +154,26 @@ class WorkoutScreen extends React.Component {
         }}
       >
         <View
-          style={{
-            backgroundColor: myColors[index % myColors.length],
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: 200,
-            borderRadius: 45,
-            marginHorizontal: 20,
-            marginVertical: 10
-          }}
+          style={[
+            styles.workoutNameTouchableOpacity,
+            { backgroundColor: myColors[index % myColors.length], fontSize: 15 }
+          ]}
         >
           <Text
             key={index}
-            style={{
-              color: myTextColors[index % myTextColors.length],
-              fontSize: 15,
-              textTransform: "uppercase",
-              letterSpacing: 2
-            }}
+            style={[
+              styles.workoutNameTouchableOpacityText,
+              { color: myTextColors[index % myTextColors.length] }
+            ]}
           >
             Day {index + 1}
           </Text>
           <Text
             key={workoutName}
-            style={{
-              color: myTextColors[index % myTextColors.length],
-              fontSize: 35,
-              textTransform: "uppercase",
-              letterSpacing: 2
-            }}
+            style={[
+              styles.workoutNameTouchableOpacityText,
+              { color: myTextColors[index % myTextColors.length], fontSize: 35 }
+            ]}
           >
             {workoutName}
           </Text>
@@ -135,10 +183,16 @@ class WorkoutScreen extends React.Component {
     return buttons;
   };
 
-  showExerciseScreen = async (workoutId) => {
+  /**
+   * Shows exerciseScreen once user clicks on a workout button -> displays sets and exercises
+   *
+   * @param {number} workoutId
+   * @returns {Promise} to getSetDataPerWorkout
+   */
+  showExerciseScreen = async workoutId => {
     this.setState({
       loading: true
-    })
+    });
     const setInfo = await this.getSetDataPerWorkout(workoutId);
     this.setState({
       setData: setInfo,
@@ -148,6 +202,12 @@ class WorkoutScreen extends React.Component {
     });
   };
 
+  /**
+   * When user presses on a workout button
+   *
+   * @param {string} workoutName the name for workout plan button
+   * @param {number} workoutId the id that comes with the button
+   */
   onPressWorkouts = (workoutName, workoutId) => {
     this.setState({
       currentWorkout: workoutName
@@ -155,12 +215,19 @@ class WorkoutScreen extends React.Component {
     this.showExerciseScreen(workoutId);
   };
 
+  /**
+   * When pressed on exercise buttons.
+   * Displays YouTube video in a modal.
+   *
+   * @param {string} exName - name for exercise.
+   * @returns {Promise} res - fetch YouTube video from exName
+   */
   onPressExercise = async exName => {
     this.setState({
       loading: true
     });
     const res = await fetch(
-      `http://7530927f.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
+      `https://845d4122.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
     );
     let youtubeLink = await res.json();
     youtubeLink = youtubeLink.youtubeUrl;
@@ -172,8 +239,14 @@ class WorkoutScreen extends React.Component {
     this.setModalVisible(true);
   };
 
+  /**
+   * Creates screen containing set data when user presses on a workout button.
+   * Displays a collapsable with exercise data in each row.
+   *
+   * @returns {JSX.Element} Collapsable to display exercise data in each row
+   */
   createSetScreen = () => {
-    let setNames = Object.keys(this.state.setData)
+    let setNames = Object.keys(this.state.setData);
     let myColors = ["#FFC107", "white"];
     let myTextColors = ["#000000", "black"];
     let setScreen = setNames.map((setName, index) => {
@@ -188,15 +261,15 @@ class WorkoutScreen extends React.Component {
             }}
             key={cuid()}
             style={{
-              display: 'flex',
+              display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              height: Dimensions.get('window').height / 8,
+              height: Dimensions.get("window").height / 8,
               backgroundColor: myColors[index % myColors.length],
-              width: '80%',
-              marginVertical: '3%',
-              borderRadius:'10%'
+              width: "80%",
+              marginVertical: "3%",
+              borderRadius: "10%"
             }}
           >
             <Text
@@ -207,7 +280,9 @@ class WorkoutScreen extends React.Component {
                 textTransform: "uppercase",
                 letterSpacing: 2
               }}
-            >{exName}</Text>
+            >
+              {exName}
+            </Text>
             <Text
               key={cuid()}
               style={{
@@ -216,33 +291,28 @@ class WorkoutScreen extends React.Component {
                 textTransform: "uppercase",
                 letterSpacing: 2
               }}
-            >{reps}</Text>
-          </TouchableOpacity>
-        )
-      })
-      return (
-        <View style={{ marginBottom: '3%' }}
-          key={cuid()} >
-          <Collapse
-            key={cuid()}
-          >
-            <CollapseHeader
-              key={cuid()}
             >
-              <View style={{
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                height: Dimensions.get('window').height / 8,
-                borderRadius: '10%',
-                backgroundColor: '#000000',
-                marginHorizontal: '5%'
-              }}
+              {reps}
+            </Text>
+          </TouchableOpacity>
+        );
+      });
+      return (
+        <View style={{ marginBottom: "3%" }} key={cuid()}>
+          <Collapse key={cuid()}>
+            <CollapseHeader key={cuid()}>
+              <View
+                style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: Dimensions.get("window").height / 8,
+                  borderRadius: "10%",
+                  backgroundColor: "#000000",
+                  marginHorizontal: "5%"
+                }}
               >
-                <Text
-                  key={cuid()}
-                  style={{ color: '#FFFFFF', fontSize: 30 }}
-                >
+                <Text key={cuid()} style={{ color: "#FFFFFF", fontSize: 30 }}>
                   {setName}
                 </Text>
               </View>
@@ -250,20 +320,22 @@ class WorkoutScreen extends React.Component {
             <CollapseBody
               key={cuid()}
               style={{
-                backgroundColor: '#555555',
-                marginHorizontal: '5%',
-                borderRadius: '10%',
+                backgroundColor: "#555555",
+                marginHorizontal: "5%",
+                borderRadius: "10%",
                 flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-              }}>
+                justifyContent: "center"
+              }}
+            >
               {exercises}
             </CollapseBody>
           </Collapse>
-        </View >)
-    })
-    return setScreen
-  }
+        </View>
+      );
+    });
+    return setScreen;
+  };
 
   render() {
     if (this.state.loading) {
@@ -274,10 +346,12 @@ class WorkoutScreen extends React.Component {
           size="large"
           style={styles.activityIndicator}
         />
-      )
+      );
     } else {
       if (this.state.showWorkoutScreen === true) {
-        let workoutButtons = this.createWorkoutButtons(this.state.searchWorkoutNames);
+        let workoutButtons = this.createWorkoutButtons(
+          this.state.searchWorkoutNames //wouldn't it just be workoutNames ?
+        );
         return (
           <View style={styles.container}>
             <View style={styles.searchSection}>
@@ -352,9 +426,7 @@ class WorkoutScreen extends React.Component {
                 </Text>
               </View>
             </View>
-            <ScrollView style={styles.workoutSection}>
-              {setScreen}
-            </ScrollView>
+            <ScrollView style={styles.workoutSection}>{setScreen}</ScrollView>
           </View>
         );
       }
@@ -362,6 +434,9 @@ class WorkoutScreen extends React.Component {
   }
 }
 
+/**
+ * Stylesheet
+ */
 const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
@@ -396,15 +471,29 @@ const styles = StyleSheet.create({
   },
 
   currentWorkoutTitle: {
-    //fontFamily: "AppleSDGothicNeo-Light",
     fontSize: 20
   },
 
   activityIndicator: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     height: 80
+  },
+
+  workoutNameTouchableOpacity: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 200,
+    borderRadius: 45,
+    marginHorizontal: 20,
+    marginVertical: 10
+  },
+
+  workoutNameTouchableOpacityText: {
+    textTransform: "uppercase",
+    letterSpacing: 2
   }
 });
 

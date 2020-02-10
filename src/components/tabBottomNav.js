@@ -6,6 +6,12 @@ import ExerciseScreen from './exerciseScreen';
 import WorkoutScreen from './workoutScreen';
 import ScaleScreen from './scaleScreen';
 
+/**
+ * Creating an app container with 3 tabs on the bottom of the screen once user agrees to the waiver
+ * 
+ * @author Bobby Nguyen
+ * @since 1.0.0
+ */
 const Nav = createAppContainer(
   createBottomTabNavigator(
     {

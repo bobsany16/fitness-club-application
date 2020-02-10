@@ -46,7 +46,7 @@ export default class App extends Component {
   }
 
   getBodyPartsAndExercises = async () => {
-    const res = await fetch("http://7530927f.ngrok.io/bodyPartsAndExercises");
+    const res = await fetch("https://845d4122.ngrok.io/bodyPartsAndExercises");
     const bodyPartsExercises = await res.json();
     return bodyPartsExercises;
   };
@@ -56,7 +56,7 @@ export default class App extends Component {
       loading: true
     });
     const res = await fetch(
-      `http://7530927f.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
+      `https://845d4122.ngrok.io/exercise/exerciseName/${exName}/youtubeLink`
     );
     let youtubeLink = await res.json();
     youtubeLink = youtubeLink.youtubeUrl;
@@ -88,7 +88,7 @@ export default class App extends Component {
                 justifyContent: "center",
                 height: Dimensions.get("window").height / 9,
                 backgroundColor: myColors[index % myColors.length],
-                borderRadius: 10,
+                borderRadius: 15,
                 marginHorizontal: 8,
                 marginVertical: 20
               }}
@@ -97,10 +97,10 @@ export default class App extends Component {
                 key={index}
                 style={{
                   color: myTextColors[index % myTextColors.length],
-                  fontSize: 20,
+                  fontSize: 15,
                   textTransform: "uppercase",
                   letterSpacing: 2,
-                  padding: 10
+                  padding: 5
                 }}
               >
                 {exName}
@@ -113,25 +113,25 @@ export default class App extends Component {
         <View
           key={index}
           style={{
-            backgroundColor: "#dfe6e9",
+            backgroundColor: "#ecf0f1", /* The litter space for the boxes*/
             width: Dimensions.get("window").width,
-            marginBottom: 10
+            marginBottom: 5
           }}
         >
           <View
-            style={{ display: "flex", flexDirection: "row", paddingLeft: 5 }}
+            style={{ display: "flex", flexDirection: "row", paddingLeft: 8, paddingTop: 5 }}
           >
             <Text
               key={element.title}
-              style={{ paddingRight: 6, fontSize: 25, fontWeight: "500" }}
+              style={{ paddingRight: 5, fontSize: 20, fontWeight: "500" }}
             >
               {element.title}
             </Text>
             <Icon
               key={index}
               name="chevron-right"
-              size={25}
-              color="#2f3640"
+              size={17}
+              color="#000000"
               style={{ paddingTop: 5 }}
             />
           </View>
@@ -164,7 +164,7 @@ export default class App extends Component {
                 paddingBottom: "5%"
               }}
             >
-              <Text style={{ fontSize: 50, fontWeight: "700" }}>
+              <Text style={{ fontSize: 50, fontWeight: "600" }}>
                 All Exercises
                 </Text>
             </View>
@@ -180,7 +180,7 @@ export default class App extends Component {
                     <Icon
                       name="chevron-left"
                       size={25}
-                      color="black"
+                      color="#000000"
                       onPress={() => {
                         this.setModalVisible(false);
                       }}

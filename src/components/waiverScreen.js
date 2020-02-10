@@ -2,6 +2,13 @@ import React from "react";
 import { ScrollView, StyleSheet, Linking, Text, View } from "react-native";
 import { Button } from "react-native-elements";
 
+/**
+ * Creates an initial waiver screen to notify user to agree to a waiver by the university.
+ * 
+ * @author Bobby Nguyen
+ * @since 1.0.0
+ * @extends React.Component 
+ */
 class WaiverScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -140,6 +147,9 @@ class WaiverScreen extends React.Component {
   }
 }
 
+/**
+ * Styletsheet for the whole screen.
+ */
 const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
